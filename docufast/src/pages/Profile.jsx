@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, FileText, CreditCard, Bell, Headphones, LogOut, ChevronRight, Shield, Trash2 } from "lucide-react";
+import { User, FileText, CreditCard, Bell, Headphones, LogOut, ChevronRight, Shield, Trash2, Camera, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import MembershipCard from "@/components/MembershipCard";
@@ -19,6 +19,7 @@ import {
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { uploadAvatar } from "@/lib/avatar";
 
 const menu = [
   { label: "My Applications", icon: FileText, to: "/applications" },
@@ -30,7 +31,7 @@ const menu = [
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, checkUserAuth } = useAuth();
   const items = user?.role === "admin"
     ? [{ label: "Admin Dashboard", icon: Shield, to: "/admin-dashboard" }, ...menu]
     : menu;
@@ -38,6 +39,25 @@ export default function Profile() {
   const handleLogout = async () => {
     await base44.auth.logout();
     window.location.href = "/login";
+  };
+
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoError, setPhotoError] = useState("");
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const onPickPhoto = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !user) return;
+    setPhotoError("");
+    setUploadingPhoto(true);
+    try {
+      await uploadAvatar(file, user.id);
+      setPhotoFailed(false);
+      await checkUserAuth(); // reload the profile so the new photo shows everywhere
+    } catch (err) {
+      setPhotoError(err.message || "Could not upload the photo.");
+    }
+    setUploadingPhoto(false);
   };
 
   const [deleting, setDeleting] = useState(false);
@@ -71,13 +91,32 @@ export default function Profile() {
       <Header />
       <main className="mx-auto max-w-5xl px-4 pb-24 pt-4">
         <div className="flex items-center gap-4 rounded-2xl bg-navy p-5 text-white">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold text-navy">
-            <User className="h-7 w-7" />
+          <div className="relative shrink-0">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gold text-navy">
+              {user?.avatar_url && !photoFailed ? (
+                <img
+                  src={user.avatar_url}
+                  alt={displayName}
+                  onError={() => setPhotoFailed(true)}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="font-heading text-xl font-bold">{initials}</span>
+              )}
+            </div>
+            <label
+              className="absolute -bottom-1 -right-1 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-navy bg-white text-navy shadow"
+              aria-label="Change profile photo"
+            >
+              {uploadingPhoto ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
+              <input type="file" accept="image/*" className="hidden" onChange={onPickPhoto} disabled={uploadingPhoto} />
+            </label>
           </div>
           <div>
             <h1 className="font-heading text-lg font-bold">{displayName}</h1>
             <p className="text-xs text-white/70">{user?.email || "—"}</p>
             <p className="mt-1 text-[11px] text-gold">Verified Customer</p>
+            {photoError && <p className="mt-1 text-[11px] text-red-300">{photoError}</p>}
           </div>
         </div>
 

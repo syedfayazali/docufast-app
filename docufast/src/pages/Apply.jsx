@@ -186,7 +186,14 @@ export default function Apply() {
     }
   };
 
-  const requirements = service?.requirements || ["Applicant ID proof", "Address proof", "Photograph"];
+  // Services saved without a document list (empty []) still get a sensible default list.
+  const requirements =
+    Array.isArray(service?.requirements) && service.requirements.length > 0
+      ? service.requirements
+      : ["Applicant ID proof", "Address proof", "Photograph"];
+  const OTHER_DOC = "Other supporting document (optional)";
+  const uploadRows = [...requirements, OTHER_DOC];
+  const uploadedRequired = requirements.filter((r) => docs[r]).length;
 
   return (
     <div className="min-h-screen bg-secondary/40">
@@ -271,7 +278,7 @@ export default function Apply() {
               <p className="mt-1 text-xs text-muted-foreground">Accepted: PDF, JPG, JPEG, PNG. Max 5 MB each.</p>
               {docError && <p className="mt-2 text-xs font-medium text-red-600">{docError}</p>}
               <div className="mt-3 space-y-3">
-                {requirements.map((r) => (
+                {uploadRows.map((r) => (
                   <div key={r} className="rounded-xl border border-border p-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-foreground">{r}</span>
@@ -303,9 +310,9 @@ export default function Apply() {
                 <Row label="Name" value={form.fullName || "—"} />
                 <Row label="Mobile" value={form.mobile || "—"} />
                 <Row label="Address" value={[form.address, form.city, form.state, form.pin].filter(Boolean).join(", ") || "—"} />
-                <Row label="Documents" value={`${Object.values(docs).filter(Boolean).length} of ${requirements.length} uploaded`} />
+                <Row label="Documents" value={`${uploadedRequired} of ${requirements.length} required uploaded`} />
               </div>
-              {Object.values(docs).filter(Boolean).length < requirements.length && (
+              {uploadedRequired < requirements.length && (
                 <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2 text-[11px] font-medium text-amber-800">
                   Missing: {requirements.filter((r) => !docs[r]).join(", ")}. You can go back to add them — missing documents can delay your application.
                 </p>

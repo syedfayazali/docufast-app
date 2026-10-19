@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Bell, Search as SearchIcon, User } from "lucide-react";
 import Logo from "@/components/Logo";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Header({ title, showSearch = false, onSearch }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [photoFailed, setPhotoFailed] = useState(false);
   return (
     <header className="sticky top-0 z-30 bg-navy text-white pt-[env(safe-area-inset-top)]">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
@@ -23,10 +26,14 @@ export default function Header({ title, showSearch = false, onSearch }) {
           </button>
           <button
             onClick={() => navigate("/profile")}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-white/10 text-white hover:bg-white/20"
             aria-label="Profile"
           >
-            <User className="h-5 w-5" />
+            {user?.avatar_url && !photoFailed ? (
+              <img src={user.avatar_url} alt="" onError={() => setPhotoFailed(true)} className="h-full w-full object-cover" />
+            ) : (
+              <User className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>

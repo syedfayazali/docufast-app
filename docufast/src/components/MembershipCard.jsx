@@ -1,40 +1,14 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { Download, Award, Check, Phone, MessageCircle, Globe, MapPin, Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 import Logo from "@/components/Logo";
 
-/* ---------- decorative QR-like pattern (self-contained, html2canvas safe) ---------- */
-function qrMatrix(seed, n = 21) {
-  const m = Array.from({ length: n }, () => Array(n).fill(0));
-  const finder = (r, c) => {
-    for (let i = 0; i < 7; i++) for (let j = 0; j < 7; j++) {
-      const edge = i === 0 || i === 6 || j === 0 || j === 6;
-      const core = i >= 2 && i <= 4 && j >= 2 && j <= 4;
-      m[r + i][c + j] = edge || core ? 1 : 0;
-    }
-  };
-  finder(0, 0);finder(0, n - 7);finder(n - 7, 0);
-  let h = 2166136261;
-  for (const ch of String(seed)) {h ^= ch.charCodeAt(0);h = Math.imul(h, 16777619);}
-  const rand = () => {h ^= h << 13;h ^= h >>> 17;h = Math.imul(h, 5);return (h >>> 0) / 4294967296;};
-  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
-    const inFinder = i < 8 && j < 8 || i < 8 && j >= n - 8 || i >= n - 8 && j < 8;
-    if (inFinder) continue;
-    m[i][j] = rand() > 0.5 ? 1 : 0;
-  }
-  return m;
-}
-function QRCode({ value, size = 92 }) {
-  const m = qrMatrix(value);
-  const n = m.length;
-  const cell = size / n;
+/* Real, scannable QR code: opens the public services page of this website. */
+function ServicesQR({ memberId, size = 78 }) {
+  const url = `${window.location.origin}/services?ref=${encodeURIComponent(memberId)}`;
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} shapeRendering="crispEdges">
-      <rect width={size} height={size} fill="#ffffff" />
-      {m.map((row, i) => row.map((v, j) => v ?
-      <rect key={`${i}-${j}`} x={j * cell} y={i * cell} width={cell} height={cell} fill="#0A1D4D" /> :
-      null))}
-    </svg>);
-
+    <QRCodeSVG value={url} size={size} level="M" marginSize={0} bgColor="#ffffff" fgColor="#0A1D4D" title="Scan to see our services" />
+  );
 }
 
 const cursive = { fontFamily: "'Brush Script MT', 'Lucida Handwriting', cursive" };
@@ -42,6 +16,7 @@ const cursive = { fontFamily: "'Brush Script MT', 'Lucida Handwriting', cursive"
 export default function MembershipCard({ user }) {
   const frontRef = useRef(null);
   const backRef = useRef(null);
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   const displayName = user?.full_name || "Customer";
   const email = user?.email || "—";
@@ -55,10 +30,12 @@ export default function MembershipCard({ user }) {
   const memberId = user?.id ? "DF-" + user.id.slice(-6).toUpperCase() : "DF-000000";
   const initials = (displayName || "C").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
+  useEffect(() => setPhotoFailed(false), [user?.avatar_url]);
+
   const handleDownload = async () => {
     const html2canvas = (await import("html2canvas")).default;
     const { jsPDF } = await import("jspdf");
-    const opts = { scale: 3, backgroundColor: null };
+    const opts = { scale: 3, backgroundColor: null, useCORS: true };
     const f = await html2canvas(frontRef.current, opts);
     const b = await html2canvas(backRef.current, opts);
     const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [f.width / 3, f.height / 3] });
@@ -78,7 +55,7 @@ export default function MembershipCard({ user }) {
       </div>
 
       {/* FRONT */}
-      <div ref={frontRef} className="relative overflow-hidden rounded-2xl bg-white shadow-card" style={{ aspectRatio: "1.6 / 1" }}>
+      <div ref={frontRef} className="keep-light relative overflow-hidden rounded-2xl bg-white shadow-card" style={{ aspectRatio: "1.6 / 1" }}>
         {/* angled navy header band */}
         <div className="absolute inset-x-0 top-0 h-[26%]">
           <div className="absolute inset-y-0 right-0 w-[80%] bg-navy" style={{ clipPath: "polygon(14% 0, 100% 0, 100% 100%, 0 100%)" }} />
@@ -93,8 +70,18 @@ export default function MembershipCard({ user }) {
         {/* body */}
         <div className="absolute inset-x-0 top-[26%] bottom-[12%] flex items-center gap-3 px-4 sm:gap-5 sm:px-6">
           {/* photo */}
-          <div className="flex h-[58%] w-auto aspect-square items-center justify-center rounded-xl border-2 border-gold bg-navy text-white">
-            <span className="font-heading text-xl font-bold">{initials}</span>
+          <div className="flex h-[58%] w-auto aspect-square items-center justify-center overflow-hidden rounded-xl border-2 border-gold bg-navy text-white">
+            {user?.avatar_url && !photoFailed ? (
+              <img
+                src={user.avatar_url}
+                alt={displayName}
+                crossOrigin="anonymous"
+                onError={() => setPhotoFailed(true)}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="font-heading text-xl font-bold">{initials}</span>
+            )}
           </div>
           {/* info */}
           <div className="flex-1 space-y-1.5 text-[10px] sm:text-xs">
@@ -106,7 +93,7 @@ export default function MembershipCard({ user }) {
           {/* qr */}
           <div className="flex flex-col items-center">
             <div className="rounded-lg border border-border bg-white p-1">
-              <QRCode value={`DF|${memberId}|${email}`} size={78} />
+              <ServicesQR memberId={memberId} size={78} />
             </div>
             <span className="mt-1 text-[7px] font-semibold uppercase tracking-wider text-muted-foreground sm:text-[8px]">Scan for our services</span>
           </div>
@@ -119,7 +106,7 @@ export default function MembershipCard({ user }) {
       </div>
 
       {/* BACK */}
-      <div ref={backRef} className="relative mt-3 overflow-hidden rounded-2xl bg-navy p-4 text-white shadow-card" style={{ aspectRatio: "1.6 / 1" }}>
+      <div ref={backRef} className="keep-light relative mt-3 overflow-hidden rounded-2xl bg-navy p-4 text-white shadow-card" style={{ aspectRatio: "1.6 / 1" }}>
         {/* top row */}
         <div className="flex items-center justify-between">
           <Logo variant="light" height={24} showName={false} />

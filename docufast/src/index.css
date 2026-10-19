@@ -131,4 +131,27 @@
   :root:not(.light) .text-navy {
     color: hsl(215 60% 62%) !important;
   }
+
+  /* Elements marked .keep-light (e.g. the membership card) look the same in dark mode as in light mode. */
+  :root:not(.light) .keep-light {
+    --background: 0 0% 100%;
+    --foreground: 223 30% 12%;
+    --card: 0 0% 100%;
+    --secondary: 222 30% 96%;
+    --muted-foreground: 223 12% 45%;
+    --border: 222 20% 90%;
+    --input: 222 20% 90%;
+  }
+  :root:not(.light) .keep-light .text-navy,
+  :root:not(.light) .keep-light.text-navy {
+    color: hsl(223 77% 17%) !important;
+  }
+  /* The global dark rule above turns every .bg-white dark; inside .keep-light white must stay white. */
+  :root:not(.light) .keep-light.bg-white,
+  :root:not(.light) .keep-light .bg-white {
+    background-color: #ffffff !important;
+  }
+  :root:not(.light) .keep-light {
+    color: hsl(223 30% 12%);
+  }
 }
