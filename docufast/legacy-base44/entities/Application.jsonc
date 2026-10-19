@@ -1,0 +1,114 @@
+{
+  "name": "Application",
+  "type": "object",
+  "properties": {
+    "reference": {
+      "type": "string"
+    },
+    "service_id": {
+      "type": "string"
+    },
+    "service_name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "customer_mobile": {
+      "type": "string"
+    },
+    "customer_email": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Submitted",
+        "Under Review",
+        "Action Required",
+        "Approved",
+        "Completed",
+        "Rejected",
+        "Cancelled"
+      ],
+      "default": "Submitted"
+    },
+    "form_data": {
+      "type": "object"
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "government_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "service_charge": {
+      "type": "number",
+      "default": 0
+    },
+    "other_charges": {
+      "type": "number",
+      "default": 0
+    },
+    "total": {
+      "type": "number",
+      "default": 0
+    },
+    "appointment_required": {
+      "type": "boolean",
+      "default": false
+    },
+    "appointment_date": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "reference",
+    "service_name",
+    "customer_name",
+    "status"
+  ],
+  "rls": {
+    "create": null,
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

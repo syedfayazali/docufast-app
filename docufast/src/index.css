@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 223 30% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 223 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 223 30% 12%;
+    --primary: 223 77% 17%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 30% 96%;
+    --secondary-foreground: 223 77% 17%;
+    --muted: 222 24% 95%;
+    --muted-foreground: 223 12% 45%;
+    --accent: 39 100% 50%;
+    --accent-foreground: 223 77% 17%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 20% 90%;
+    --input: 222 20% 90%;
+    --ring: 39 100% 50%;
+    --gold: 39 100% 50%;
+    --navy: 223 77% 17%;
+    --chart-1: 223 77% 17%;
+    --chart-2: 39 100% 50%;
+    --chart-3: 197 37% 40%;
+    --chart-4: 43 74% 56%;
+    --chart-5: 27 87% 60%;
+    --radius: 0.75rem;
+    --font-heading: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --sidebar-background: 223 77% 17%;
+    --sidebar-foreground: 222 20% 90%;
+    --sidebar-primary: 39 100% 50%;
+    --sidebar-primary-foreground: 223 77% 12%;
+    --sidebar-accent: 223 60% 25%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 223 50% 28%;
+    --sidebar-ring: 39 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-heading tracking-tight;
+  }
+}
+
+@layer utilities {
+  .bg-navy { background-color: hsl(var(--navy)); }
+  .text-navy { color: hsl(var(--navy)); }
+  .bg-gold { background-color: hsl(var(--gold)); }
+  .text-gold { color: hsl(var(--gold)); }
+  .border-gold { border-color: hsl(var(--gold)); }
+  .shadow-card { box-shadow: 0 1px 3px rgba(10,29,77,0.06), 0 8px 24px rgba(10,29,77,0.06); }
+  .shadow-navy { box-shadow: 0 12px 40px rgba(10,29,77,0.18); }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+/* iOS native: disable text selection on interactive chrome, keep it for content */
+@layer base {
+  button,
+  a,
+  nav,
+  [role="button"],
+  [role="tab"],
+  label,
+  input,
+  select,
+  textarea,
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html,
+  body {
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  nav a,
+  nav button {
+    min-height: 44px;
+  }
+}
+
+/* Dark mode adapts the navy/gold theme automatically on devices using dark color scheme */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: 222 30% 10%;
+    --foreground: 210 30% 96%;
+    --card: 222 28% 13%;
+    --card-foreground: 210 30% 96%;
+    --popover: 222 28% 13%;
+    --popover-foreground: 210 30% 96%;
+    --primary: 223 60% 35%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 24% 18%;
+    --secondary-foreground: 210 30% 96%;
+    --muted: 222 22% 16%;
+    --muted-foreground: 222 15% 66%;
+    --accent: 39 100% 50%;
+    --accent-foreground: 222 30% 10%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 96%;
+    --border: 222 20% 22%;
+    --input: 222 20% 22%;
+    --ring: 39 100% 50%;
+    --sidebar-background: 222 40% 9%;
+    --sidebar-foreground: 210 30% 90%;
+    --sidebar-border: 222 30% 20%;
+  }
+
+  /* Dark-mode readability: remap hardcoded white surfaces and navy text so they stay visible */
+  :root:not(.light) .bg-white {
+    background-color: hsl(var(--card)) !important;
+  }
+  :root:not(.light) .text-navy {
+    color: hsl(215 60% 62%) !important;
+  }
+}

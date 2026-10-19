@@ -1,0 +1,15 @@
+{
+  "name": "DocuFast India",
+  "short_name": "DocuFast",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0A1D4D",
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/6a99a28a5cee4eafc7da7547/68510801a_WhatsAppImage2026-08-06at40553PM.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
