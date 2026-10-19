@@ -139,11 +139,28 @@ async function me() {
     .maybeSingle();
 
   const meta = authUser.user_metadata || {};
+
+  // Own uploaded photo: saved link first; if the link is missing, look for the file itself.
+  let ownPhoto = profile?.avatar_url || '';
+  if (!ownPhoto) {
+    try {
+      const { data: files } = await supabase.storage.from('avatars').list(authUser.id, { limit: 5 });
+      const f = (files || []).find((x) => x.name === 'avatar.jpg');
+      if (f) {
+        const base = supabase.storage.from('avatars').getPublicUrl(`${authUser.id}/avatar.jpg`).data.publicUrl;
+        ownPhoto = `${base}?v=${encodeURIComponent(f.updated_at || f.created_at || '1')}`;
+      }
+    } catch {
+      /* no photo */
+    }
+  }
   return {
     id: authUser.id,
     email: authUser.email,
     full_name: profile?.full_name || meta.full_name || meta.name || '',
     role: profile?.role || 'user',
+    // own upload first, then the Google profile picture if they signed in with Google
+    avatar_url: ownPhoto || meta.avatar_url || meta.picture || '',
     created_date: authUser.created_at,
   };
 }

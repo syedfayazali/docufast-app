@@ -48,6 +48,8 @@ export const AuthProvider = ({ children }) => {
     await base44.auth.logout(shouldRedirect ? '/login' : undefined);
   };
 
+  const updateUser = (patch) => setUser((u) => (u ? { ...u, ...patch } : u));
+
   const navigateToLogin = () => base44.auth.redirectToLogin(window.location.href);
 
   return (
@@ -63,6 +65,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         navigateToLogin,
         checkUserAuth,
+        updateUser,
         checkAppState: checkUserAuth,
       }}
     >

@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import { base44 } from "@/api/base44Client";
 
 /** Centre-crop to a square and shrink, so uploads are small (a few tens of KB). */
 async function toSquareJpeg(file, size = 480) {
@@ -43,6 +42,19 @@ export async function uploadAvatar(file, userId) {
   if (error) throw new Error("Could not upload the photo. Please try again.");
   const { data } = supabase.storage.from("avatars").getPublicUrl(path);
   const url = `${data.publicUrl}?v=${Date.now()}`; // changes on every upload so the new photo shows at once
-  await base44.entities.User.update(userId, { avatar_url: url });
+  // Save the link on the profile. Done directly so a failure tells us exactly what is wrong.
+  const { data: row, error: upErr } = await supabase
+    .from("profiles")
+    .update({ avatar_url: url })
+    .eq("id", userId)
+    .select("avatar_url")
+    .maybeSingle();
+  if (upErr) {
+    if (/avatar_url/i.test(upErr.message || "")) {
+      throw new Error("Database is missing the photo column. Run migration_005_profile_photos.sql in Supabase.");
+    }
+    throw new Error(`Photo uploaded but could not be saved to your profile (${upErr.message}).`);
+  }
+  if (!row) throw new Error("Photo uploaded but your profile row was not found or is not editable.");
   return url;
 }

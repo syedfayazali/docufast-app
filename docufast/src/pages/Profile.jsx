@@ -31,7 +31,7 @@ const menu = [
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, checkUserAuth } = useAuth();
+  const { user, checkUserAuth, updateUser } = useAuth();
   const items = user?.role === "admin"
     ? [{ label: "Admin Dashboard", icon: Shield, to: "/admin-dashboard" }, ...menu]
     : menu;
@@ -51,9 +51,10 @@ export default function Profile() {
     setPhotoError("");
     setUploadingPhoto(true);
     try {
-      await uploadAvatar(file, user.id);
+      const url = await uploadAvatar(file, user.id);
       setPhotoFailed(false);
-      await checkUserAuth(); // reload the profile so the new photo shows everywhere
+      updateUser({ avatar_url: url }); // show it immediately everywhere
+      checkUserAuth(); // then re-sync with the database
     } catch (err) {
       setPhotoError(err.message || "Could not upload the photo.");
     }
@@ -116,9 +117,11 @@ export default function Profile() {
             <h1 className="font-heading text-lg font-bold">{displayName}</h1>
             <p className="text-xs text-white/70">{user?.email || "—"}</p>
             <p className="mt-1 text-[11px] text-gold">Verified Customer</p>
-            {photoError && <p className="mt-1 text-[11px] text-red-300">{photoError}</p>}
           </div>
         </div>
+        {photoError && (
+          <p className="mt-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-medium text-red-700">{photoError}</p>
+        )}
 
         <div className="mt-4 rounded-2xl border border-border bg-white p-4 shadow-card">
           <h2 className="px-1 font-heading text-sm font-bold text-navy">Account Information</h2>
