@@ -161,10 +161,10 @@ create table if not exists public.payments (
   status               text not null default 'Pending' check (status in ('Pending','Paid','Failed','Refunded')),
   utr                  text,
   payment_proof_uri    text,
-  -- online gateway (Cashfree; columns keep their old razorpay_* names)
+  -- online gateway (Razorpay: order_xxx / pay_xxx ids)
   razorpay_order_id    text,
   razorpay_payment_id  text,
-  payment_method       text,            -- 'cashfree' | 'upi_manual'
+  payment_method       text,            -- 'razorpay' | 'upi_manual' (legacy rows may say 'cashfree')
   paid_at              timestamptz,
   created_date         timestamptz not null default now(),
   updated_date         timestamptz not null default now(),

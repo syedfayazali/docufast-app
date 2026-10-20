@@ -13,12 +13,12 @@ const UPI_ID = "paytm.s2sk0dc@pty";
 const PAYEE_NAME = "Mr SYED FAYAZ ALI";
 const QR_IMAGE = "https://media.base44.com/images/public/6a99a28a5cee4eafc7da7547/4127f4aef_image.png";
 
-// Loads Cashfree Checkout once, on demand.
-function loadCashfreeScript() {
+// Loads Razorpay Checkout once, on demand.
+function loadRazorpayScript() {
   return new Promise((resolve, reject) => {
-    if (window.Cashfree) return resolve();
+    if (window.Razorpay) return resolve();
     const s = document.createElement("script");
-    s.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    s.src = "https://checkout.razorpay.com/v1/checkout.js";
     s.onload = () => resolve();
     s.onerror = () => reject(new Error("Could not load the payment window. Check your internet connection."));
     document.body.appendChild(s);
@@ -72,7 +72,7 @@ export default function Pay() {
     loadData();
   }, [loadData]);
 
-  // Online payment (Cashfree): UPI, cards, net banking, wallets.
+  // Online payment (Razorpay): UPI, cards, net banking, wallets.
   const payOnline = async () => {
     if (!application) return;
     setPayError("");
@@ -82,14 +82,34 @@ export default function Pay() {
     try {
       const order = await authedPost("/api/create-order", { application_id: application.id });
       orderId = order.order_id;
-      await loadCashfreeScript();
-      const cashfree = window.Cashfree({ mode: order.mode });
-      const result = await cashfree.checkout({ paymentSessionId: order.payment_session_id, redirectTarget: "_modal" });
-      if (result?.error && !result?.paymentDetails) {
-        // Closed or failed before paying – still ask the server, it is the only source of truth.
-        setPayError(result.error.message || "Payment was not completed. You can try again.");
+      await loadRazorpayScript();
+
+      // Resolves when checkout succeeds or is closed; the server is the only source of truth either way.
+      const outcome = await new Promise((resolve) => {
+        const rzp = new window.Razorpay({
+          key: order.key_id,
+          order_id: order.order_id,
+          amount: order.amount,
+          currency: order.currency,
+          name: "DocuFast India",
+          description: `${application.service_name || "Service"} · ${application.reference || ""}`.trim(),
+          prefill: order.prefill,
+          theme: { color: "#0B1F4B" },
+          handler: (resp) => resolve({ ok: true, resp }),
+          modal: { ondismiss: () => resolve({ ok: false }) },
+        });
+        rzp.on("payment.failed", (r) => {
+          setPayError(r?.error?.description || "Payment failed. You can try again.");
+        });
+        rzp.open();
+      });
+
+      if (outcome.ok) {
+        await confirmPayment(orderId, outcome.resp);
+      } else {
+        // Closed without paying (or paid but the callback was lost) – ask the server anyway.
+        await confirmPayment(orderId, null, { quiet: true });
       }
-      await confirmPayment(orderId);
     } catch (e) {
       setPayError(e.message || "Could not start payment");
       // If the gateway itself is down/misconfigured, surface the manual option.
@@ -99,15 +119,21 @@ export default function Pay() {
     }
   };
 
-  // Ask the server to confirm with Cashfree, then refresh. Retries briefly in case the bank is slow.
-  const confirmPayment = async (orderId) => {
+  // Ask the server to confirm with Razorpay, then refresh. Retries briefly in case the bank is slow.
+  const confirmPayment = async (orderId, resp, { quiet = false } = {}) => {
+    const body = { order_id: orderId };
+    if (resp) {
+      body.payment_id = resp.razorpay_payment_id;
+      body.signature = resp.razorpay_signature;
+    }
     for (let i = 0; i < 4; i += 1) {
       try {
-        await authedPost("/api/verify-payment", { order_id: orderId });
+        await authedPost("/api/verify-payment", body);
         setPayError("");
         await loadData();
         return;
       } catch (e) {
+        if (quiet) break; // dismissed checkout: "not paid" is the expected answer
         if (i === 3) {
           setPayNote("If money was deducted, we'll confirm it automatically within a few minutes. You can also check Payment History.");
         } else {
@@ -117,13 +143,6 @@ export default function Pay() {
     }
     await loadData();
   };
-
-  // Returning from a bank/UPI app redirect: ?cf_order=<id>
-  useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get("cf_order");
-    if (id && user) confirmPayment(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
 
   const copyUpi = async () => {
     try {
@@ -264,7 +283,7 @@ export default function Pay() {
                 {payError && <p className="mt-2 text-[11px] font-medium text-red-600">{payError}</p>}
                 {payNote && <p className="mt-2 text-[11px] font-medium text-emerald-700">{payNote}</p>}
                 <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                  UPI, cards, net banking &amp; wallets · Secured by Cashfree
+                  UPI, cards, net banking &amp; wallets · Secured by Razorpay
                 </p>
                 <p className="mt-1 text-center text-[11px] text-muted-foreground">
                   Your application is submitted to our team as soon as payment is confirmed.
