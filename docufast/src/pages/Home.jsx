@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShieldCheck, Activity, Headphones, ChevronRight, FileText, Plane, ScrollText, Award, Users } from "lucide-react";
+import { Search, ShieldCheck, Activity, Headphones, ChevronRight, FileText, Plane, ScrollText, Award, Users, Calendar } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
@@ -162,6 +162,22 @@ export default function Home() {
           </div>
           {trackMsg && <p className="mt-2 text-xs font-medium text-red-600">{trackMsg}</p>}
         </div>
+
+        {/* Book appointment */}
+        <Link
+          to="/book-appointment"
+          className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-card"
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gold/10 text-gold">
+            <Calendar className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-heading text-sm font-semibold text-foreground">Book an Appointment</h3>
+            <p className="text-xs text-muted-foreground">Pick a time to visit us or get a call.</p>
+          </div>
+          <span className="text-xs font-semibold text-gold">Book Now</span>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        </Link>
 
         {/* Need help */}
         <Link

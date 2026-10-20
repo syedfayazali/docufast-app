@@ -119,6 +119,14 @@ export default function ApplicationDetail() {
               )}
             </div>
           )}
+          {isPaid && app.appointment_required && (
+            <button
+              onClick={() => navigate(`/book-appointment?application=${app.id}`)}
+              className="mt-3 w-full rounded-xl bg-gold py-2.5 text-xs font-bold text-navy"
+            >
+              Book your appointment for this application
+            </button>
+          )}
           {isPaid && (
             <button
               onClick={() => navigate(`/receipt/${app.id}`)}

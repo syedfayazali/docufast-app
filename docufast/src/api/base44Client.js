@@ -23,6 +23,8 @@ const TABLES = {
   Payment: 'payments',
   User: 'profiles',
   Address: 'addresses',
+  Appointment: 'appointments',
+  AppointmentSettings: 'appointment_settings',
 };
 
 // Columns the database owns; never sent back on update/create.
@@ -274,5 +276,17 @@ const Core = {
   },
 };
 
-export const base44 = { entities, auth, integrations: { Core } };
+/** Appointment helpers: which slots are already taken (counts only, no personal data). */
+const appointments = {
+  async slotCounts(from, to) {
+    const { data, error } = await supabase.rpc('appointment_slot_counts', {
+      p_from: from.toISOString(),
+      p_to: to.toISOString(),
+    });
+    if (error) fail(error);
+    return data || [];
+  },
+};
+
+export const base44 = { entities, auth, integrations: { Core }, appointments };
 export default base44;

@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, FileText, Settings, Users, CreditCard, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, FileText, Settings, Users, CreditCard, ArrowLeft, Calendar } from "lucide-react";
 import Logo from "@/components/Logo";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,7 @@ const nav = [
   { to: "/admin-applications", label: "Apps", icon: FileText },
   { to: "/service-editor", label: "Services", icon: Settings },
   { to: "/admin-users", label: "Users", icon: Users },
+  { to: "/admin-appointments", label: "Bookings", icon: Calendar },
   { to: "/admin-payments", label: "Payments", icon: CreditCard },
 ];
 

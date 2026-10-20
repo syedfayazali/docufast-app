@@ -38,6 +38,8 @@ import Notifications from '@/pages/Notifications';
 import Profile from '@/pages/Profile';
 import Pay from '@/pages/Pay';
 import Receipt from '@/pages/Receipt';
+import BookAppointment from '@/pages/BookAppointment';
+import MyAppointments from '@/pages/MyAppointments';
 
 // Admin pages
 import AdminDashboard from '@/pages/admin/AdminDashboard';
@@ -45,6 +47,7 @@ import AdminApplications from '@/pages/admin/AdminApplications';
 import ServiceEditor from '@/pages/admin/ServiceEditor';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import AdminPayments from '@/pages/admin/AdminPayments';
+import AdminAppointments from '@/pages/admin/AdminAppointments';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -97,6 +100,8 @@ const AuthenticatedApp = () => {
         <Route path="/pay" element={<Pay />} />
         <Route path="/receipt/:id" element={<Receipt />} />
         <Route path="/payments" element={<Payments />} />
+        <Route path="/book-appointment" element={<BookAppointment />} />
+        <Route path="/my-appointments" element={<MyAppointments />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/profile" element={<Profile />} />
         <Route element={<AdminRoute />}>
@@ -105,6 +110,7 @@ const AuthenticatedApp = () => {
           <Route path="/service-editor" element={<ServiceEditor />} />
           <Route path="/admin-users" element={<AdminUsers />} />
           <Route path="/admin-payments" element={<AdminPayments />} />
+          <Route path="/admin-appointments" element={<AdminAppointments />} />
         </Route>
       </Route>
 

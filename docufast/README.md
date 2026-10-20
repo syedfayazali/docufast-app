@@ -245,3 +245,15 @@ In Supabase → SQL Editor run `supabase/migration_003_addresses.sql`. Customers
 4. Unpaid drafts appear in *My Applications* with a **Complete payment** button. Starting the same service again removes the older untouched draft.
 5. After payment: confirmation screen, **printable receipt** (`/receipt/<application id>`), and a timeline (created → payment → review → approved → completed).
 6. Manual UPI (fallback): the customer submits UTR + screenshot; the admin verifies it under *Payments*, which moves the application to **Under Review**.
+
+---
+
+## Appointments (customer booking)
+
+Customers book from **Home → Book an Appointment**, **Dashboard → Book Appointment**, or the button on a paid application that needs an appointment. They pick a date and a free time; they can cancel or reschedule from **Profile → My Appointments**.
+
+**Setup (once):** Supabase → SQL Editor → run `supabase/migration_006_appointments.sql`. (Fresh installs already get it from `schema.sql`.)
+
+**You control it** in the admin app → **Bookings**: working days, opening/closing time, lunch break, slot length, people per slot, how many days ahead, minimum notice, cancellation window, holidays, office address. The same page lists **Today / Upcoming / History** with *Done / No-show / Cancel* buttons and a note the customer sees.
+
+The database itself refuses double-booking, closed days, holidays, lunch time and past times, so it cannot be bypassed from the browser. All times are India time.

@@ -7,12 +7,13 @@ import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { fmtFull } from "@/lib/appointments";
 
 const quickActions = [
   { label: "Apply for Service", icon: FileText, to: "/services" },
   { label: "Track Application", icon: Activity, to: "/applications" },
   { label: "Upload Documents", icon: Upload, to: "/applications" },
-  { label: "Book Appointment", icon: Calendar, to: "/services" },
+  { label: "Book Appointment", icon: Calendar, to: "/book-appointment" },
   { label: "Contact Support", icon: Headphones, to: "/help" },
 ];
 
@@ -35,6 +36,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [apps, setApps] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [appts, setAppts] = useState([]);
 
   useEffect(() => {
     if (!user) return;
@@ -42,6 +44,12 @@ export default function Dashboard() {
       .then(setApps)
       .catch(() => {})
       .finally(() => setLoading(false));
+    const loadAppts = () =>
+      base44.entities.Appointment.filter({ created_by_id: user.id, status: "Booked" }, "slot_start", 20)
+        .then((r) => setAppts(r.filter((x) => new Date(x.slot_end).getTime() > Date.now()).slice(0, 3)))
+        .catch(() => {});
+    loadAppts();
+    return base44.entities.Appointment.subscribe(loadAppts);
   }, [user]);
 
   const activeApps = apps.filter((a) => !["Completed", "Rejected", "Cancelled"].includes(a.status));
@@ -106,7 +114,23 @@ export default function Dashboard() {
 
         <h2 className="mt-6 px-1 font-heading text-base font-bold text-foreground">Upcoming Appointments</h2>
         <div className="mt-3">
-          <EmptyState icon={Calendar} title="No appointments" description="Book one from a service page." />
+          {appts.length === 0 ? (
+            <EmptyState icon={Calendar} title="No appointments" description="Pick a time to visit our office or get a call." action={<Link to="/book-appointment" className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white">Book appointment</Link>} />
+          ) : (
+            <div className="space-y-3">
+              {appts.map((a) => (
+                <Link key={a.id} to="/my-appointments" className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-card">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-navy/5 text-navy"><Calendar className="h-5 w-5" /></div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-foreground">{fmtFull(a.slot_start)}</p>
+                    <p className="text-xs text-muted-foreground">{a.kind}{a.service_name ? ` · ${a.service_name}` : ""}</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-gold" />
+                </Link>
+              ))}
+              <Link to="/my-appointments" className="block text-center text-xs font-semibold text-gold">View all appointments</Link>
+            </div>
+          )}
         </div>
 
         <h2 className="mt-6 px-1 font-heading text-base font-bold text-foreground">Recent Notifications</h2>

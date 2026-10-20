@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, FileText, CreditCard, Bell, Headphones, LogOut, ChevronRight, Shield, Trash2, Camera, Loader2 } from "lucide-react";
+import { User, FileText, CreditCard, Bell, Headphones, LogOut, ChevronRight, Shield, Trash2, Camera, Loader2, Calendar } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import MembershipCard from "@/components/MembershipCard";
@@ -23,6 +23,7 @@ import { uploadAvatar } from "@/lib/avatar";
 
 const menu = [
   { label: "My Applications", icon: FileText, to: "/applications" },
+  { label: "My Appointments", icon: Calendar, to: "/my-appointments" },
   { label: "Payment History", icon: CreditCard, to: "/payments" },
   { label: "Notifications", icon: Bell, to: "/notifications" },
   { label: "Help & Support", icon: Headphones, to: "/help" },

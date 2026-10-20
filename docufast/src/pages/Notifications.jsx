@@ -5,6 +5,7 @@ import BottomNav from "@/components/BottomNav";
 import EmptyState from "@/components/EmptyState";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { fmtFull } from "@/lib/appointments";
 
 const messageFor = (a) => {
   switch (a.status) {
@@ -39,14 +40,30 @@ export default function Notifications() {
 
   useEffect(() => {
     if (!user) return;
-    base44.entities.Application.filter({ created_by_id: user.id }, "-updated_date")
-      .then((apps) => {
-        setItems(apps.map((a) => ({
+    Promise.all([
+      base44.entities.Application.filter({ created_by_id: user.id }, "-updated_date"),
+      base44.entities.Appointment.filter({ created_by_id: user.id }, "-updated_date", 20).catch(() => []),
+    ])
+      .then(([apps, appts]) => {
+        const a1 = apps.map((a) => ({
           id: a.id,
           text: messageFor(a),
-          time: fmtAgo(a.updated_date || a.created_date),
+          at: a.updated_date || a.created_date,
           unread: a.status === "Action Required",
-        })));
+        }));
+        const a2 = appts.map((a) => ({
+          id: a.id,
+          text: a.status === "Booked"
+            ? `Appointment ${a.reference} confirmed for ${fmtFull(a.slot_start)}.`
+            : a.status === "Cancelled"
+              ? `Appointment ${a.reference} (${fmtFull(a.slot_start)}) was cancelled${a.cancelled_by === "admin" ? " by our office" : ""}.`
+              : `Appointment ${a.reference} marked ${a.status}.`,
+          at: a.updated_date || a.created_date,
+          unread: a.status === "Cancelled" && a.cancelled_by === "admin",
+        }));
+        setItems([...a1, ...a2]
+          .sort((x, y) => new Date(y.at) - new Date(x.at))
+          .map((n) => ({ ...n, time: fmtAgo(n.at) })));
       })
       .catch(() => {})
       .finally(() => setLoading(false));

@@ -10,10 +10,17 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-dig
 export default function AdminDashboard() {
   const [apps, setApps] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [todayAppts, setTodayAppts] = useState(0);
 
   useEffect(() => {
     base44.entities.Application.list("-created_date", 200).then((rows) => setApps(rows.filter((a) => a.status !== "Draft"))).catch(() => {});
     base44.entities.Payment.list("-created_date", 200).then(setPayments).catch(() => {});
+    base44.entities.Appointment.filter({ status: "Booked" }, "slot_start", 300)
+      .then((r) => {
+        const t = new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
+        setTodayAppts(r.filter((a) => new Date(new Date(a.slot_start).getTime() + 5.5 * 3600 * 1000).toISOString().slice(0, 10) === t).length);
+      })
+      .catch(() => {});
   }, []);
 
   const pending = apps.filter((a) => ["Submitted", "Under Review"].includes(a.status)).length;
@@ -26,7 +33,7 @@ export default function AdminDashboard() {
     { label: "Pending", value: pending, icon: Clock, tone: "bg-amber-50 text-amber-700" },
     { label: "Action Required", value: actionReq, icon: AlertCircle, tone: "bg-orange-50 text-orange-700" },
     { label: "Completed", value: completed, icon: CheckCircle2, tone: "bg-emerald-50 text-emerald-700" },
-    { label: "Today's Appointments", value: 0, icon: Calendar, tone: "bg-violet-50 text-violet-700" },
+    { label: "Today's Appointments", value: todayAppts, icon: Calendar, tone: "bg-violet-50 text-violet-700" },
     { label: "Payments to Verify", value: `₹${pendingPay.toLocaleString()}`, icon: CreditCard, tone: "bg-red-50 text-red-700" },
     { label: "Open Support Tickets", value: 0, icon: Headphones, tone: "bg-cyan-50 text-cyan-700" },
   ];
