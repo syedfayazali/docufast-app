@@ -112,7 +112,7 @@ export default function BookAppointment() {
         });
       }
       const mail = await notifyAppointment(row.id, existing ? "rescheduled" : "booked");
-      setDone({ ...row, _mailed: !!mail.sent });
+      setDone({ ...row, _mailed: !!mail.sent, _mailWhy: mail.sent ? '' : (mail.detail || mail.reason || 'unknown') });
     } catch (e) {
       setError(e.message || "Could not book. Please try another slot.");
       setSlot(null);
@@ -141,6 +141,7 @@ export default function BookAppointment() {
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
               {done._mailed ? `A confirmation was sent to ${done.customer_email || user?.email}. ` : ""}
+              {!done._mailed && done._mailWhy ? `(Confirmation email not sent: ${done._mailWhy}.) ` : ""}
               {done.kind === "Office visit" ? "Please arrive 5–10 minutes early and bring your original documents. " : ""}
               You can reschedule or cancel from My Appointments.
             </p>

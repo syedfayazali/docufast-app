@@ -115,9 +115,13 @@ export default handler(['POST'], async (req, res) => {
     body: JSON.stringify(body),
   });
   if (!r.ok) {
-    console.error('[appointment-mail]', r.status, await r.text().catch(() => ''));
-    return send(res, 200, { sent: false, reason: 'mail-provider-error' });
+    const txt = await r.text().catch(() => '');
+    console.error('[appointment-mail] Brevo', r.status, txt);
+    let msg = '';
+    try { msg = JSON.parse(txt).message || ''; } catch { msg = txt.slice(0, 200); }
+    return send(res, 200, { sent: false, reason: 'mail-provider-error', detail: `Brevo ${r.status}: ${msg}` });
   }
-  await admin.from('appointments').update({ last_mailed: key }).eq('id', id);
+  const { error: markErr } = await admin.from('appointments').update({ last_mailed: key }).eq('id', id);
+  if (markErr) console.error('[appointment-mail] could not save last_mailed (run migration 007?)', markErr.message);
   send(res, 200, { sent: true });
 });
