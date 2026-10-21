@@ -89,15 +89,17 @@ export async function notifyAppointment(id, event) {
   try {
     const { data } = await supabase.auth.getSession();
     const token = data?.session?.access_token;
-    if (!token) return { sent: false };
+    if (!token) return { sent: false, detail: "not logged in" };
     const res = await fetch("/api/appointment-mail", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ id, event }),
     });
-    return await res.json().catch(() => ({ sent: false }));
-  } catch {
-    return { sent: false };
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok || out.error) return { sent: false, detail: `server said ${res.status}: ${out.error || "no JSON (is /api/appointment-mail deployed?)"}` };
+    return out;
+  } catch (e) {
+    return { sent: false, detail: `request failed: ${e?.message || e}` };
   }
 }
 
