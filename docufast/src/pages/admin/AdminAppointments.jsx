@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Phone, MapPin, Loader2, Save } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { base44 } from "@/api/base44Client";
+import { notifyAppointment } from "@/lib/appointments";
 import { fmtTime, fmtFull, todayIST, addDays, DAY_NAMES, statusTone } from "@/lib/appointments";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +36,7 @@ export default function AdminAppointments() {
     setBusy(a.id); setError("");
     try {
       await base44.entities.Appointment.update(a.id, { status });
+      await notifyAppointment(a.id, { Completed: "completed", Cancelled: "cancelled", "No Show": "no_show" }[status]);
       await load();
     } catch (e) { setError(e.message); }
     finally { setBusy(""); }

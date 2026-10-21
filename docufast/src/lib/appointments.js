@@ -81,3 +81,38 @@ export const statusTone = {
 
 /** Slot counts -> Map(ms -> count) */
 export const countMap = (rows) => new Map((rows || []).map((r) => [new Date(r.slot_start).getTime(), Number(r.booked)]));
+
+import { supabase } from "@/lib/supabase";
+
+/** Ask the server to e-mail the customer about this appointment. Never blocks or breaks the app. */
+export async function notifyAppointment(id, event) {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const token = data?.session?.access_token;
+    if (!token) return { sent: false };
+    const res = await fetch("/api/appointment-mail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ id, event }),
+    });
+    return await res.json().catch(() => ({ sent: false }));
+  } catch {
+    return { sent: false };
+  }
+}
+
+const icsStamp = (d) => new Date(d).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+
+/** Download a calendar (.ics) file so the customer can add the appointment to their phone calendar. */
+export function downloadIcs(a, where) {
+  const text = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DocuFast India//Appointments//EN", "BEGIN:VEVENT",
+    `UID:${a.reference}@docufast`, `DTSTAMP:${icsStamp(new Date())}`, `DTSTART:${icsStamp(a.slot_start)}`, `DTEND:${icsStamp(a.slot_end)}`,
+    `SUMMARY:DocuFast India appointment${a.service_name ? " - " + a.service_name : ""}`,
+    `LOCATION:${String(where || "").replace(/[\r\n,;]/g, " ")}`, "END:VEVENT", "END:VCALENDAR",
+  ].join("\r\n");
+  const url = URL.createObjectURL(new Blob([text], { type: "text/calendar" }));
+  const el = document.createElement("a");
+  el.href = url; el.download = `appointment-${a.reference}.ics`; el.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}

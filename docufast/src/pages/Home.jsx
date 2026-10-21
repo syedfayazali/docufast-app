@@ -23,23 +23,6 @@ export default function Home() {
   const [services, setServices] = useState(null);
   const [banner, setBanner] = useState(null);
   const { isAuthenticated } = useAuth();
-  const [trackRef, setTrackRef] = useState("");
-  const [trackMsg, setTrackMsg] = useState("");
-
-  const track = async () => {
-    setTrackMsg("");
-    const ref = trackRef.trim();
-    if (!ref) { setTrackMsg("Enter your application number."); return; }
-    if (!isAuthenticated) { navigate("/login?returnTo=%2Fhome"); return; }
-    try {
-      const rows = await base44.entities.Application.filter({ reference: ref });
-      if (rows[0]) navigate(`/applications/${rows[0].id}`);
-      else setTrackMsg("No application with that number was found in your account.");
-    } catch {
-      setTrackMsg("Could not look that up right now. Please try again.");
-    }
-  };
-
   React.useEffect(() => {
     base44.entities.Service.list("display_order", 50)
       .then(setServices)
@@ -136,31 +119,6 @@ export default function Home() {
           ) : (
             results.map((s) => <ServiceCard key={s.id} service={s} />)
           )}
-        </div>
-
-        {/* Track application */}
-        <div className="mt-6 rounded-2xl border border-border bg-white p-5 shadow-card">
-          <div className="flex items-center gap-2 text-navy">
-            <Activity className="h-5 w-5" />
-            <h2 className="font-heading text-base font-bold">Track Your Application</h2>
-          </div>
-          <p className="mt-1 text-sm text-muted-foreground">Enter your application/reference number.</p>
-          <div className="mt-3 flex gap-2">
-            <input
-              value={trackRef}
-              onChange={(e) => setTrackRef(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && track()}
-              placeholder="e.g. DFI-2026-000001"
-              className="flex-1 rounded-xl border border-input bg-white px-3 py-2.5 text-sm outline-none focus:border-gold"
-            />
-            <button
-              onClick={track}
-              className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white"
-            >
-              Track Status
-            </button>
-          </div>
-          {trackMsg && <p className="mt-2 text-xs font-medium text-red-600">{trackMsg}</p>}
         </div>
 
         {/* Book appointment */}

@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { bookableDays, slotsForDay, countMap, dow, DAY_NAMES, fmtFull, fmtDay, slotInstant } from "@/lib/appointments";
+import { bookableDays, slotsForDay, countMap, dow, DAY_NAMES, fmtFull, fmtDay, slotInstant, notifyAppointment, downloadIcs } from "@/lib/appointments";
 import { cn } from "@/lib/utils";
 
 const field = "w-full rounded-xl border border-border bg-white px-3 py-2.5 text-sm outline-none focus:border-gold";
@@ -19,6 +19,8 @@ export default function BookAppointment() {
   const [settings, setSettings] = useState(null);
   const [counts, setCounts] = useState(new Map());
   const [apps, setApps] = useState([]);
+  const [services, setServices] = useState([]);
+  const [serviceId, setServiceId] = useState(params.get("service") || "");
   const [existing, setExisting] = useState(null);
   const [loading, setLoading] = useState(true);
   const [day, setDay] = useState(null);
@@ -47,6 +49,7 @@ export default function BookAppointment() {
       try {
         const s = await base44.entities.AppointmentSettings.get("main");
         setSettings(s);
+        base44.entities.Service.list("display_order", 300).then((r) => setServices(r.filter((x) => x.active !== false))).catch(() => {});
         const [mine, appts] = await Promise.all([
           base44.entities.Application.filter({ created_by_id: user.id }, "-created_date", 30),
           rescheduleId ? base44.entities.Appointment.filter({ id: rescheduleId }) : Promise.resolve([]),
@@ -61,6 +64,7 @@ export default function BookAppointment() {
           setName(appts[0].customer_name);
           setMobile(appts[0].customer_mobile);
           setApplicationId(appts[0].application_id || "");
+          setServiceId(appts[0].service_id || (appts[0].service_name ? "" : "general"));
           setPurpose(appts[0].purpose || "");
         }
         await loadCounts(s);
@@ -86,6 +90,7 @@ export default function BookAppointment() {
     setError("");
     if (!slot) return setError("Please choose a time.");
     if (!existing) {
+      if (!serviceId && !applicationId) return setError("Please select the service you need help with.");
       if (!name.trim()) return setError("Please enter your name.");
       if (!/^[0-9+\- ]{8,15}$/.test(mobile.trim())) return setError("Please enter a valid mobile number.");
     }
@@ -101,11 +106,13 @@ export default function BookAppointment() {
           customer_mobile: mobile.trim(),
           customer_email: user?.email || null,
           application_id: applicationId || null,
+          service_id: !applicationId && serviceId && serviceId !== "general" ? serviceId : null,
           purpose: purpose.trim() || null,
           slot_start: slot.at.toISOString(),
         });
       }
-      setDone(row);
+      const mail = await notifyAppointment(row.id, existing ? "rescheduled" : "booked");
+      setDone({ ...row, _mailed: !!mail.sent });
     } catch (e) {
       setError(e.message || "Could not book. Please try another slot.");
       setSlot(null);
@@ -124,10 +131,23 @@ export default function BookAppointment() {
             <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
             <h1 className="mt-3 font-heading text-lg font-bold text-foreground">{existing ? "Appointment rescheduled" : "Appointment booked"}</h1>
             <p className="mt-1 font-mono text-xs font-semibold text-navy">{done.reference}</p>
-            <p className="mt-3 text-base font-semibold text-foreground">{fmtFull(done.slot_start)}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {done.kind === "Phone callback" ? "We will call you on " + done.customer_mobile + "." : settings?.location || "Please visit our office at this time."}
+            <div className="mt-4 rounded-xl bg-secondary p-3 text-left text-sm">
+              <Row k="Date & time" v={fmtFull(done.slot_start)} />
+              <Row k="Type" v={done.kind} />
+              <Row k="Service" v={done.service_name || "General enquiry"} />
+              <Row k="Name" v={done.customer_name} />
+              <Row k="Mobile" v={done.customer_mobile} />
+              <Row k={done.kind === "Phone callback" ? "We will call" : "Where"} v={done.kind === "Phone callback" ? done.customer_mobile : settings?.location || "Our office"} />
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {done._mailed ? `A confirmation was sent to ${done.customer_email || user?.email}. ` : ""}
+              {done.kind === "Office visit" ? "Please arrive 5–10 minutes early and bring your original documents. " : ""}
+              You can reschedule or cancel from My Appointments.
             </p>
+            <div className="mt-3 flex gap-2">
+              <button onClick={() => downloadIcs(done, settings?.location)} className="flex-1 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-foreground">Add to calendar</button>
+              <Link to={`/appointment/${done.id}`} className="flex-1 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-foreground">View receipt</Link>
+            </div>
             <div className="mt-5 flex gap-2">
               <Link to="/my-appointments" className="flex-1 rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white">My appointments</Link>
               <Link to="/dashboard" className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-foreground">Dashboard</Link>
@@ -204,6 +224,18 @@ export default function BookAppointment() {
             {!existing && (
               <div className="mt-5 space-y-3 rounded-2xl border border-border bg-white p-4 shadow-card">
                 <div>
+                  <label className="text-xs font-semibold text-muted-foreground">Service you need help with *</label>
+                  <select className={field} value={applicationId ? (apps.find((x) => x.id === applicationId)?.service_id || "") : serviceId} disabled={!!applicationId} onChange={(e) => setServiceId(e.target.value)}>
+                    <option value="">— Select a service —</option>
+                    {[...new Set(services.map((x) => x.category))].map((c) => (
+                      <optgroup key={c} label={c}>
+                        {services.filter((x) => x.category === c).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+                      </optgroup>
+                    ))}
+                    <option value="general">General enquiry / not sure</option>
+                  </select>
+                </div>
+                <div>
                   <label className="text-xs font-semibold text-muted-foreground">Your name</label>
                   <input className={field} value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
                 </div>
@@ -214,7 +246,7 @@ export default function BookAppointment() {
                 {apps.length > 0 && (
                   <div>
                     <label className="text-xs font-semibold text-muted-foreground">About an application (optional)</label>
-                    <select className={field} value={applicationId} onChange={(e) => setApplicationId(e.target.value)}>
+                    <select className={field} value={applicationId} onChange={(e) => { setApplicationId(e.target.value); if (e.target.value) setServiceId(""); }}>
                       <option value="">— Not about a specific application —</option>
                       {apps.map((a) => <option key={a.id} value={a.id}>{a.reference} · {a.service_name}</option>)}
                     </select>
@@ -240,6 +272,15 @@ export default function BookAppointment() {
         )}
       </main>
       <BottomNav />
+    </div>
+  );
+}
+
+function Row({ k, v }) {
+  return (
+    <div className="flex justify-between gap-3 py-1">
+      <span className="text-muted-foreground">{k}</span>
+      <span className="text-right font-semibold text-foreground">{v}</span>
     </div>
   );
 }

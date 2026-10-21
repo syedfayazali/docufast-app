@@ -6,7 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import EmptyState from "@/components/EmptyState";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { fmtFull, canChange, statusTone } from "@/lib/appointments";
+import { fmtFull, canChange, statusTone, notifyAppointment } from "@/lib/appointments";
 import { cn } from "@/lib/utils";
 
 export default function MyAppointments() {
@@ -37,7 +37,7 @@ export default function MyAppointments() {
   const cancel = async (a) => {
     if (!window.confirm("Cancel this appointment?")) return;
     setBusy(a.id); setError("");
-    try { await base44.entities.Appointment.update(a.id, { status: "Cancelled" }); await load(); }
+    try { await base44.entities.Appointment.update(a.id, { status: "Cancelled" }); await notifyAppointment(a.id, "cancelled"); await load(); }
     catch (e) { setError(e.message); }
     finally { setBusy(""); }
   };
@@ -52,12 +52,13 @@ export default function MyAppointments() {
         <span className="font-mono text-xs font-semibold text-navy">{a.reference}</span>
         <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", statusTone[a.status])}>{a.status}</span>
       </div>
-      <p className="mt-2 font-heading text-sm font-semibold text-foreground">{fmtFull(a.slot_start)}</p>
+      <Link to={`/appointment/${a.id}`} className="mt-2 block font-heading text-sm font-semibold text-foreground">{fmtFull(a.slot_start)}</Link>
       <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
         {a.kind === "Phone callback" ? <Phone className="h-3.5 w-3.5" /> : <MapPin className="h-3.5 w-3.5" />}
         {a.kind === "Phone callback" ? `We will call ${a.customer_mobile}` : settings?.location || "Our office"}
       </p>
       {a.service_name && <p className="mt-1 text-xs text-muted-foreground">For: {a.service_name}</p>}
+      <Link to={`/appointment/${a.id}`} className="mt-1 inline-block text-[11px] font-semibold text-gold">View receipt &amp; details →</Link>
       {a.admin_note && <p className="mt-2 rounded-lg bg-secondary px-2.5 py-1.5 text-xs text-foreground">Note from us: {a.admin_note}</p>}
       {a.status === "Booked" && (
         canChange(a, settings) ? (

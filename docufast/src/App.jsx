@@ -40,6 +40,7 @@ import Pay from '@/pages/Pay';
 import Receipt from '@/pages/Receipt';
 import BookAppointment from '@/pages/BookAppointment';
 import MyAppointments from '@/pages/MyAppointments';
+import AppointmentDetail from '@/pages/AppointmentDetail';
 
 // Admin pages
 import AdminDashboard from '@/pages/admin/AdminDashboard';
@@ -102,6 +103,7 @@ const AuthenticatedApp = () => {
         <Route path="/payments" element={<Payments />} />
         <Route path="/book-appointment" element={<BookAppointment />} />
         <Route path="/my-appointments" element={<MyAppointments />} />
+        <Route path="/appointment/:id" element={<AppointmentDetail />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/profile" element={<Profile />} />
         <Route element={<AdminRoute />}>
