@@ -1,8 +1,8 @@
 // POST /api/appointment-mail   body: { id, event }
 // event: booked | rescheduled | cancelled | completed | no_show
-// Sends the customer an e-mail (via Resend) that matches the appointment's CURRENT state.
+// Sends the customer an e-mail (via Brevo) that matches the appointment's CURRENT state.
 // The browser can only ask; this function checks who is asking and what really happened.
-// Needs env: RESEND_API_KEY, MAIL_FROM  (optional: MAIL_REPLY_TO, MAIL_ADMIN_COPY, SUPPORT_PHONE)
+// Needs env: BREVO_API_KEY, MAIL_FROM  (optional: MAIL_REPLY_TO, MAIL_ADMIN_COPY, SUPPORT_PHONE)
 import { adminClient, requireUser, handler, readJson, send, HttpError } from './_lib/core.js';
 
 const STATUS_FOR = { booked: 'Booked', rescheduled: 'Booked', cancelled: 'Cancelled', completed: 'Completed', no_show: 'No Show' };
@@ -79,8 +79,10 @@ export default handler(['POST'], async (req, res) => {
   const key = `${event}|${new Date(a.slot_start).toISOString()}`;
   if (a.last_mailed === key) return send(res, 200, { sent: false, reason: 'already-sent' });
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.MAIL_FROM;
+  const apiKey = process.env.BREVO_API_KEY;
+  const from = process.env.MAIL_FROM; // "DocuFast India <bookings@yourdomain.com>" or just the address
+  const fm = /^\s*(?:"?([^"<]*?)"?\s*)?<([^>]+)>\s*$/.exec(from || '');
+  const sender = fm ? { name: (fm[1] || 'DocuFast India').trim(), email: fm[2].trim() } : { name: 'DocuFast India', email: (from || '').trim() };
   if (!apiKey || !from) return send(res, 200, { sent: false, reason: 'mail-not-configured' });
 
   let to = a.customer_email;
@@ -96,20 +98,20 @@ export default handler(['POST'], async (req, res) => {
   const { subject, html } = render({ a, event, location: st?.location, phone, siteUrl, note: st?.note });
 
   const body = {
-    from, to: [to], subject, html,
-    ...(process.env.MAIL_REPLY_TO ? { reply_to: process.env.MAIL_REPLY_TO } : {}),
-    ...(process.env.MAIL_ADMIN_COPY && ['booked', 'rescheduled', 'cancelled'].includes(event) ? { bcc: [process.env.MAIL_ADMIN_COPY] } : {}),
+    sender, to: [{ email: to }], subject, htmlContent: html,
+    ...(process.env.MAIL_REPLY_TO ? { replyTo: { email: process.env.MAIL_REPLY_TO } } : {}),
+    ...(process.env.MAIL_ADMIN_COPY && ['booked', 'rescheduled', 'cancelled'].includes(event) ? { bcc: [{ email: process.env.MAIL_ADMIN_COPY }] } : {}),
   };
   if (event === 'booked' || event === 'rescheduled') {
-    body.attachments = [{
-      filename: `appointment-${a.reference}.ics`,
+    body.attachment = [{
+      name: `appointment-${a.reference}.ics`,
       content: Buffer.from(ics(a, `DocuFast India appointment${a.service_name ? ' – ' + a.service_name : ''}`, st?.location)).toString('base64'),
     }];
   }
 
-  const r = await fetch('https://api.resend.com/emails', {
+  const r = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    headers: { 'api-key': apiKey, accept: 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
   if (!r.ok) {

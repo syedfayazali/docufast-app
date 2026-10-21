@@ -261,13 +261,13 @@ The database itself refuses double-booking, closed days, holidays, lunch time an
 ### Appointment e-mails (confirmation, reschedule, cancel, completed)
 
 1. Supabase → SQL Editor → run `supabase/migration_007_appointment_service_mail.sql` (after 006).
-2. In Resend (the service you already use for login e-mails) create an **API key**.
+2. In Brevo → top-right menu → **SMTP & API → API Keys → Generate a new API key** (this is different from the SMTP password). Also check **Senders, Domains & Dedicated IPs → Senders** that the address you send from is verified.
 3. Vercel → Settings → Environment Variables, add (Production + Preview), then **Redeploy**:
 
    | Name | Value |
    |---|---|
-   | `RESEND_API_KEY` | `re_...` |
-   | `MAIL_FROM` | `DocuFast India <bookings@your-verified-domain.com>` |
+   | `BREVO_API_KEY` | `xkeysib-...` |
+   | `MAIL_FROM` | `DocuFast India <your-verified-sender@gmail.com>` (must be a verified sender in Brevo) |
    | `MAIL_ADMIN_COPY` | optional – you get a copy of bookings/cancellations |
    | `MAIL_REPLY_TO` | optional – where customer replies go |
    | `SUPPORT_PHONE` | optional – printed in the e-mail |
