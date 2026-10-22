@@ -5,6 +5,8 @@ import EmptyState from "@/components/EmptyState";
 import { Search, FileText, ChevronDown } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import DocumentLink from "@/components/DocumentLink";
+import UpdateComposer from "@/components/UpdateComposer";
+import { addressLines } from "@/lib/orders";
 
 const statusOptions = ["Draft", "Submitted", "Under Review", "Action Required", "Approved", "Completed", "Rejected", "Cancelled"];
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -14,6 +16,7 @@ export default function AdminApplications() {
   const [filter, setFilter] = useState("All");
   const [apps, setApps] = useState([]);
   const [openId, setOpenId] = useState(null);
+  const [noteId, setNoteId] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const load = () => {
@@ -84,6 +87,13 @@ export default function AdminApplications() {
               <h3 className="mt-1.5 font-heading text-sm font-semibold text-foreground">{a.service_name}</h3>
               <p className="text-[11px] text-muted-foreground">{a.customer_name} · {a.customer_mobile} · {fmtDate(a.created_date)}</p>
 
+              {addressLines(a).length > 0 && (
+                <div className="mt-2 rounded-lg bg-secondary/60 p-2.5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Customer address</p>
+                  <p className="mt-0.5 text-xs text-foreground">{addressLines(a).join(", ")}</p>
+                </div>
+              )}
+
               {Object.keys(a.form_data?._doc_paths || {}).length > 0 && (
                 <div className="mt-2 space-y-1.5 rounded-lg bg-secondary/60 p-2.5">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Documents</p>
@@ -103,6 +113,15 @@ export default function AdminApplications() {
                 Update status
                 <ChevronDown className={`h-4 w-4 transition-transform ${openId === a.id ? "rotate-180" : ""}`} />
               </button>
+
+              <button
+                onClick={() => setNoteId(noteId === a.id ? null : a.id)}
+                className="mt-2 flex w-full items-center justify-between rounded-lg bg-secondary px-3 py-2 text-xs font-semibold text-navy"
+              >
+                Notes &amp; reference numbers
+                <ChevronDown className={`h-4 w-4 transition-transform ${noteId === a.id ? "rotate-180" : ""}`} />
+              </button>
+              {noteId === a.id && <UpdateComposer application={a} />}
 
               {openId === a.id && (
                 <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">

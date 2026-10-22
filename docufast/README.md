@@ -273,3 +273,12 @@ The database itself refuses double-booking, closed days, holidays, lunch time an
    | `SUPPORT_PHONE` | optional – printed in the e-mail |
 
 Every e-mail shows reference, date & time, type, address, service and status; booking/reschedule e-mails include a calendar file. If these variables are missing, bookings still work – only the e-mails are skipped. Customers can also open any booking as a printable **receipt** (My Appointments → View receipt).
+
+## Customer updates, addresses and Orders
+
+Run `supabase/migration_008_updates_orders.sql` once in Supabase → SQL Editor.
+
+- **Notes for customers:** Admin → Apps (or an order) → *Notes & reference numbers*. Fill a title, a label + reference/tracking number, a message and optionally a link. The customer sees it in a highlighted **Updates from our team** panel on their application (reference numbers shown large with a Copy button), in Notifications, and by email if you leave *Also email the customer* ticked. *Private note* keeps it admin-only.
+- **Customer address** now shows on every application in admin.
+- **Orders** (admin bottom bar): every paid application, newest first, with a **NEW** badge until you open it. Open one → **Print order** (customer, address, payment, application details, documents, notes). Tick *Include private notes* if you want them on the print.
+- Optional: set `MAIL_ADMIN_COPY` and `SITE_URL` in Vercel to get an email for each new paid order.

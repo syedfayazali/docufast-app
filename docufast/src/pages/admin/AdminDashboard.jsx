@@ -34,6 +34,7 @@ export default function AdminDashboard() {
     { label: "Action Required", value: actionReq, icon: AlertCircle, tone: "bg-orange-50 text-orange-700" },
     { label: "Completed", value: completed, icon: CheckCircle2, tone: "bg-emerald-50 text-emerald-700" },
     { label: "Today's Appointments", value: todayAppts, icon: Calendar, tone: "bg-violet-50 text-violet-700" },
+    { label: "New Orders", value: apps.filter((a) => !a.admin_seen_at).length, icon: FileText, tone: "bg-indigo-50 text-indigo-700" },
     { label: "Payments to Verify", value: `₹${pendingPay.toLocaleString()}`, icon: CreditCard, tone: "bg-red-50 text-red-700" },
     { label: "Open Support Tickets", value: 0, icon: Headphones, tone: "bg-cyan-50 text-cyan-700" },
   ];

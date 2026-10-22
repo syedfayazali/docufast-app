@@ -49,6 +49,8 @@ import ServiceEditor from '@/pages/admin/ServiceEditor';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import AdminPayments from '@/pages/admin/AdminPayments';
 import AdminAppointments from '@/pages/admin/AdminAppointments';
+import AdminOrders from '@/pages/admin/AdminOrders';
+import AdminOrderDetail from '@/pages/admin/AdminOrderDetail';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -113,6 +115,8 @@ const AuthenticatedApp = () => {
           <Route path="/admin-users" element={<AdminUsers />} />
           <Route path="/admin-payments" element={<AdminPayments />} />
           <Route path="/admin-appointments" element={<AdminAppointments />} />
+          <Route path="/admin-orders" element={<AdminOrders />} />
+          <Route path="/admin-orders/:id" element={<AdminOrderDetail />} />
         </Route>
       </Route>
 

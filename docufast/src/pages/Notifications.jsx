@@ -43,8 +43,16 @@ export default function Notifications() {
     Promise.all([
       base44.entities.Application.filter({ created_by_id: user.id }, "-updated_date"),
       base44.entities.Appointment.filter({ created_by_id: user.id }, "-updated_date", 20).catch(() => []),
+      base44.entities.ApplicationUpdate.list("-created_date", 30).catch(() => []),
     ])
-      .then(([apps, appts]) => {
+      .then(([apps, appts, ups]) => {
+        const byId = Object.fromEntries(apps.map((a) => [a.id, a]));
+        const a3 = ups.filter((u) => byId[u.application_id]).map((u) => ({
+          id: u.id,
+          text: `${byId[u.application_id].reference}: ${u.title || "New update"}${u.ref_number ? ` – ${u.ref_label || "Ref"} ${u.ref_number}` : ""}`,
+          at: u.created_date,
+          unread: !u.seen_at,
+        }));
         const a1 = apps.map((a) => ({
           id: a.id,
           text: messageFor(a),
@@ -61,7 +69,7 @@ export default function Notifications() {
           at: a.updated_date || a.created_date,
           unread: a.status === "Cancelled" && a.cancelled_by === "admin",
         }));
-        setItems([...a1, ...a2]
+        setItems([...a1, ...a2, ...a3]
           .sort((x, y) => new Date(y.at) - new Date(x.at))
           .map((n) => ({ ...n, time: fmtAgo(n.at) })));
       })

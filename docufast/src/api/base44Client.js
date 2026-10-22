@@ -25,6 +25,7 @@ const TABLES = {
   Address: 'addresses',
   Appointment: 'appointments',
   AppointmentSettings: 'appointment_settings',
+  ApplicationUpdate: 'application_updates',
 };
 
 // Columns the database owns; never sent back on update/create.

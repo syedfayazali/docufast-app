@@ -7,6 +7,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import DocumentLink from "@/components/DocumentLink";
+import UpdatesPanel from "@/components/UpdatesPanel";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
 
@@ -142,6 +143,8 @@ export default function ApplicationDetail() {
             </div>
           )}
         </div>
+
+        <UpdatesPanel applicationId={app.id} />
 
         <h2 className="mt-6 px-1 font-heading text-base font-bold text-foreground">Application Timeline</h2>
         <div className="mt-3 rounded-2xl border border-border bg-white p-5 shadow-card">
