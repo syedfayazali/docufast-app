@@ -7,7 +7,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import DocumentLink from "@/components/DocumentLink";
-import UpdatesPanel from "@/components/UpdatesPanel";
+import UpdateCard, { useApplicationUpdates, stepForStatus } from "@/components/UpdatesPanel";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
 
@@ -19,6 +19,7 @@ export default function ApplicationDetail() {
   const [payment, setPayment] = useState(null);
   const [loading, setLoading] = useState(true);
   const prevStatus = useRef(null);
+  const { items: updates, fresh } = useApplicationUpdates(id);
 
   useEffect(() => {
     base44.entities.Application.get(id)
@@ -144,8 +145,6 @@ export default function ApplicationDetail() {
           )}
         </div>
 
-        <UpdatesPanel applicationId={app.id} />
-
         <h2 className="mt-6 px-1 font-heading text-base font-bold text-foreground">Application Timeline</h2>
         <div className="mt-3 rounded-2xl border border-border bg-white p-5 shadow-card">
           <ol className="relative">
@@ -159,6 +158,9 @@ export default function ApplicationDetail() {
                   <p className={`text-sm font-semibold ${t.done ? "text-foreground" : "text-muted-foreground"}`}>{t.status}</p>
                   <p className="text-[11px] text-muted-foreground">{t.date}</p>
                   <p className="text-[11px] text-muted-foreground">Updated by {t.by}</p>
+                  {updates.filter((u) => stepForStatus(u.status_at_time) === i).map((u) => (
+                    <UpdateCard key={u.id} u={u} isNew={fresh.has(u.id)} />
+                  ))}
                 </div>
               </li>
             ))}
