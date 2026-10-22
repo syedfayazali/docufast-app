@@ -9,7 +9,7 @@ function CopyBtn({ text }) {
   return (
     <button
       onClick={async () => { try { await navigator.clipboard.writeText(text); setOk(true); setTimeout(() => setOk(false), 1500); } catch { /* ignore */ } }}
-      className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1 text-[11px] font-semibold text-navy"
+      className="inline-flex items-center gap-1 text-[11px] font-semibold text-gold"
     >
       {ok ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />} {ok ? "Copied" : "Copy"}
     </button>
@@ -56,7 +56,7 @@ export function stepForStatus(status) {
 /** One update card, shown inside the timeline. */
 export default function UpdateCard({ u, isNew }) {
   return (
-    <article className="mt-2 rounded-xl border border-gold/60 bg-gold/5 p-3">
+    <article className="mt-2">
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-sm font-bold text-foreground">{u.title || "Update"}</h3>
         {isNew && <span className="rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-navy">NEW</span>}
@@ -64,10 +64,10 @@ export default function UpdateCard({ u, isNew }) {
       <p className="text-[11px] text-muted-foreground">{stamp(u.created_date)}</p>
 
       {u.ref_number && (
-        <div className="mt-2 rounded-xl border-2 border-navy/80 bg-white p-3 text-center">
+        <div className="mt-1.5">
           <p className="text-[11px] font-semibold text-muted-foreground">{u.ref_label || "Reference number"}</p>
-          <p className="mt-0.5 break-all font-mono text-xl font-extrabold tracking-wide text-navy">{u.ref_number}</p>
-          <div className="mt-2"><CopyBtn text={u.ref_number} /></div>
+          <p className="break-all font-mono text-lg font-extrabold tracking-wide text-navy">{u.ref_number}</p>
+          <div className="mt-1"><CopyBtn text={u.ref_number} /></div>
         </div>
       )}
       {u.message && <p className="mt-2 whitespace-pre-line text-sm text-foreground">{u.message}</p>}
