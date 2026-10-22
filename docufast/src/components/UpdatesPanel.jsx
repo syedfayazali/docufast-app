@@ -25,7 +25,7 @@ export function useApplicationUpdates(applicationId) {
     let alive = true;
     const load = async () => {
       try {
-        const rows = await base44.entities.ApplicationUpdate.filter({ application_id: applicationId }, "-created_date", 50);
+        const rows = await base44.entities.ApplicationUpdate.filter({ application_id: applicationId }, "created_date", 50);
         if (!alive) return;
         setItems(rows);
         const unseen = rows.filter((r) => !r.seen_at);
