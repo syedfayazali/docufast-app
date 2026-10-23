@@ -21,6 +21,8 @@ export default function Privacy() {
           "Application details you enter: full name, parent/spouse name, date of birth, gender, mobile number, email, address, city, district, state and PIN code.",
           "Documents you upload for an application (for example ID proof, address proof, photograph).",
           "Payment details: the amount, the UPI transaction reference (UTR) and the payment screenshot you submit. We do not receive or store your card numbers or UPI PIN.",
+          "Saved delivery addresses. If you tap \"Use my location\", your device location (approximate or precise, as you allow) is read once to fill in the address. It is used only for that, and you can refuse the permission and type the address instead.",
+          "Appointment bookings: your name, mobile number, chosen date and time, and the service you need help with.",
           "Messages you send us through the contact or support form.",
           "Basic technical data needed to run the site, such as a login session stored in your browser.",
         ]} />
@@ -41,7 +43,7 @@ export default function Privacy() {
         <p>We do not sell your personal information. We share it only:</p>
         <List items={[
           "With the government department or authority that processes your application, to the extent needed for it.",
-          "With service providers who help us run the site, under their own security terms: Supabase (database, login and file storage), Vercel (website hosting), our email delivery provider (sign-in and password-reset emails) and Google (if you choose Sign in with Google).",
+          "With service providers who help us run the site, under their own security terms: Supabase (database, login and file storage), Vercel (website hosting), Cashfree (online payment processing), Brevo and our email delivery provider (sign-in, appointment and application update emails) and Google (if you choose Sign in with Google).",
           "Where required by law, court order or a lawful request from authorities.",
         ]} />
         <p>

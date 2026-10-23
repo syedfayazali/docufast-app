@@ -13,6 +13,7 @@ export default function Footer() {
           <Link to="/privacy" className="hover:underline">Privacy Policy</Link>
           <Link to="/refund-policy" className="hover:underline">Refund &amp; Cancellation</Link>
           <Link to="/contact" className="hover:underline">Contact Us</Link>
+          <Link to="/delete-account" className="hover:underline">Delete Account</Link>
         </nav>
         <p className="mx-auto mt-4 max-w-2xl text-[11px] leading-relaxed text-muted-foreground">
           {b.brandName} is an independent, privately operated assistance service. We are not a government

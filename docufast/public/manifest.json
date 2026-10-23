@@ -1,15 +1,25 @@
 {
+  "id": "/",
   "name": "DocuFast India",
   "short_name": "DocuFast",
-  "start_url": "/",
+  "description": "Private assistance service for government and document applications. Not a government website.",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "start_url": "/home",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#0A1D4D",
+  "categories": ["business", "productivity"],
   "icons": [
-    {
-      "src": "https://media.base44.com/images/public/6a99a28a5cee4eafc7da7547/68510801a_WhatsAppImage2026-08-06at40553PM.jpeg",
-      "sizes": "512x512",
-      "type": "image/jpeg"
-    }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Services", "url": "/services", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "My Applications", "url": "/applications", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Book Appointment", "url": "/book-appointment", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

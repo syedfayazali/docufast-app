@@ -26,6 +26,7 @@ import Terms from '@/pages/legal/Terms';
 import Privacy from '@/pages/legal/Privacy';
 import Refund from '@/pages/legal/Refund';
 import Contact from '@/pages/legal/Contact';
+import DeleteAccount from '@/pages/legal/DeleteAccount';
 
 // Customer pages
 import Dashboard from '@/pages/Dashboard';
@@ -85,6 +86,7 @@ const AuthenticatedApp = () => {
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/refund-policy" element={<Refund />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/delete-account" element={<DeleteAccount />} />
 
       {/* Auth */}
       <Route path="/login" element={<Login />} />
