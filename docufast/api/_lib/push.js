@@ -21,6 +21,7 @@ export function pushReady() {
 async function sendTo(admin, rows, payload) {
   const body = JSON.stringify(payload);
   let sent = 0;
+  const errors = [];
   await Promise.all(
     rows.map(async (r) => {
       try {
@@ -32,11 +33,12 @@ async function sendTo(admin, rows, payload) {
           await admin.from('push_subscriptions').delete().eq('id', r.id);
         } else {
           console.error('[push] send failed', e?.statusCode, e?.body || e?.message);
+          errors.push(`${e?.statusCode || ''} ${String(e?.body || e?.message || '').slice(0, 120)}`.trim());
         }
       }
     })
   );
-  return sent;
+  return { sent, errors };
 }
 
 /** payload: { title, body, url, tag } */
@@ -45,7 +47,8 @@ export async function pushToUser(admin, userId, payload) {
   try {
     const { data } = await admin.from('push_subscriptions').select('*').eq('user_id', String(userId));
     if (!data?.length) return { sent: 0, reason: 'no-subscription' };
-    return { sent: await sendTo(admin, data, payload) };
+    const r = await sendTo(admin, data, payload);
+    return { sent: r.sent, subscriptions: data.length, errors: r.errors };
   } catch (e) {
     console.error('[push]', e);
     return { sent: 0, reason: 'error' };
@@ -60,7 +63,8 @@ export async function pushToAdmins(admin, payload) {
     if (!ids.length) return { sent: 0, reason: 'no-admin' };
     const { data } = await admin.from('push_subscriptions').select('*').in('user_id', ids);
     if (!data?.length) return { sent: 0, reason: 'no-subscription' };
-    return { sent: await sendTo(admin, data, payload) };
+    const r = await sendTo(admin, data, payload);
+    return { sent: r.sent, subscriptions: data.length, errors: r.errors };
   } catch (e) {
     console.error('[push]', e);
     return { sent: 0, reason: 'error' };

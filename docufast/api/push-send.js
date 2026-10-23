@@ -8,10 +8,15 @@ import { pushToUser, statusPush, updatePush } from './_lib/push.js';
 export default handler(['POST'], async (req, res) => {
   const admin = adminClient();
   const user = await requireUser(req, admin);
+  const { type, id } = await readJson(req);
+
+  // Anyone logged in may send a test alert to their own phone.
+  if (type === 'test') {
+    return send(res, 200, await pushToUser(admin, user.id, { title: 'DocuFast India', body: 'Test alert. Your phone alerts are working.', url: '/notifications', tag: 'test' }));
+  }
+
   const { data: prof } = await admin.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (prof?.role !== 'admin') throw new HttpError(403, 'Not allowed');
-
-  const { type, id } = await readJson(req);
   if (!id || !['status', 'update'].includes(type)) throw new HttpError(400, 'Invalid request');
 
   if (type === 'status') {

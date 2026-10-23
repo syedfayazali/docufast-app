@@ -1,16 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { BellRing, Loader2 } from "lucide-react";
-import { pushState, enablePush, disablePush } from "@/lib/push";
+import { pushState, enablePush, disablePush, pushTest } from "@/lib/push";
 
 /** "Get alerts on this phone" switch. The permission prompt appears only after the person taps it. */
 export default function PushToggle({ className = "" }) {
   const [state, setState] = useState("loading");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [info, setInfo] = useState("");
 
   useEffect(() => { pushState().then(setState); }, []);
 
   if (state === "loading" || state === "unsupported") return null;
+
+  const test = async () => {
+    setBusy(true); setInfo(""); setErr("");
+    try {
+      const r = await pushTest();
+      if (r.error) setInfo(`Server error: ${r.error}`);
+      else if (r.reason === "push-not-configured") setInfo("Server: alerts are not configured (keys missing in Vercel, or not redeployed).");
+      else if (r.reason === "no-subscription") setInfo("Server: this phone is not registered. Turn alerts Off and On again.");
+      else if (r.sent > 0) setInfo("Server sent the test alert. Lock the phone and watch for it now.");
+      else setInfo(`Server could not deliver: ${(r.errors || []).join("; ") || r.reason || "unknown"}`);
+    } catch (e) { setInfo("Could not reach the server."); }
+    finally { setBusy(false); }
+  };
 
   const toggle = async () => {
     setBusy(true); setErr("");
@@ -39,6 +53,12 @@ export default function PushToggle({ className = "" }) {
           </button>
         )}
       </div>
+      {state === "on" && (
+        <div className="mt-3">
+          <button onClick={test} disabled={busy} className="text-xs font-semibold text-navy underline disabled:opacity-50">Send a test alert to this phone</button>
+          {info && <p className="mt-1 text-xs text-muted-foreground">{info}</p>}
+        </div>
+      )}
       {err && <p className="mt-2 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs text-red-700">{err}</p>}
     </div>
   );
