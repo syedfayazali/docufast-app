@@ -4,7 +4,7 @@ plugins {
 
 // ===================== EDIT THESE TWO LINES ONLY =====================
 // Your live website address WITHOUT https:// and WITHOUT a trailing slash.
-def SITE_HOST = "YOUR-SITE.vercel.app"
+def SITE_HOST = "docufast-app.vercel.app"
 // =====================================================================
 
 android {

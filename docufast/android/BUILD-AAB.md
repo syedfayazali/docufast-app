@@ -6,13 +6,8 @@ This folder is a complete Android project that opens your website full-screen (a
 1. Install Android Studio from https://developer.android.com/studio (official Google site). Accept the defaults; it installs the Android SDK and Java for you.
 2. Get this folder on your computer: it is `android/` inside your GitHub project (`C:\Users\ADMIN\Downloads\work\docufast\android` after `git pull`).
 
-## Set your website address
-Open `android/app/build.gradle` in Notepad and change this one line:
-
-```
-def SITE_HOST = "YOUR-SITE.vercel.app"
-```
-to your real address, without `https://` and without a slash at the end. Save.
+## Website address
+Already set to `docufast-app.vercel.app` in `android/app/build.gradle`. If you ever move to your own domain, change the line `def SITE_HOST = "..."` (no `https://`, no slash at the end) and build again.
 
 ## Build
 1. Android Studio → **Open** → choose the `android` folder → wait until the bottom bar finishes ("Gradle sync").
@@ -28,7 +23,7 @@ to your real address, without `https://` and without a slash at the end. Save.
 ## Verify (removes the browser bar)
 1. In Play Console, after uploading the `.aab`: *Test and release → App integrity → App signing* → copy the **SHA-256 certificate fingerprint** of the *App signing key certificate*.
 2. Put it in `public/.well-known/assetlinks.json` in place of `REPLACE_WITH_PLAY_APP_SIGNING_SHA256` (and the upload-key fingerprint in place of the other line; get it by running `keytool -list -v -keystore C:\Keys\docufast-upload.jks` and copying the SHA256 line, same format `AA:BB:…`).
-3. `git add .`, `git commit`, `git push`; when Vercel is Ready, open `https://YOUR-SITE/.well-known/assetlinks.json` to see it.
+3. `git add .`, `git commit`, `git push`; when Vercel is Ready, open `https://docufast-app.vercel.app/.well-known/assetlinks.json` to see it.
 
 ## For every later release
 Increase `versionCode` by 1 in `app/build.gradle` and repeat "Build". Website changes alone need no new upload.
