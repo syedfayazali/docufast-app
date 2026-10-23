@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId 'in.docufastindia.app'   // can never change after publishing
-        minSdk 23
+        minSdk 24
         targetSdk 36
         versionCode 1                          // +1 for every new upload to Play
         versionName '1.0'
