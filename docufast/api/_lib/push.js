@@ -24,7 +24,7 @@ async function sendTo(admin, rows, payload) {
   await Promise.all(
     rows.map(async (r) => {
       try {
-        await webpush.sendNotification({ endpoint: r.endpoint, keys: { p256dh: r.p256dh, auth: r.auth } }, body, { TTL: 86400 });
+        await webpush.sendNotification({ endpoint: r.endpoint, keys: { p256dh: r.p256dh, auth: r.auth } }, body, { TTL: 86400, urgency: 'high' });
         sent += 1;
       } catch (e) {
         // 404/410 = the phone removed the subscription: clean it up.
