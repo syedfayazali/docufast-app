@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "in.docufastindia.app",
       "sha256_cert_fingerprints": [
-        "24:DE:0B:7E:10:78:4D:4C:BE:2F:F4:8F:AA:9D:F6:7E:26:5A:82:EF:8E:39:91:6B:AE:39:67:61:F2:45:A8:57"
+        "24:DE:0B:7E:10:78:4D:4C:BE:2F:F4:8F:AA:9D:F6:7E:26:5A:82:EF:8E:39:91:6B:AE:39:67:61:F2:45:A8:57",
+        "00:CE:1F:FD:E2:91:52:26:7F:61:B0:80:56:33:11:61:8B:9B:F8:AC:4F:92:53:47:BF:1D:9C:38:F2:9C:BB:5A"
       ]
     }
   }
