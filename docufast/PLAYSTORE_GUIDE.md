@@ -8,7 +8,7 @@ Your app is a website, so it goes to Play as a **Trusted Web Activity (TWA)**: a
 
 | Item | Status |
 |---|---|
-| App icons (192, 512, maskable) as real files, no longer hosted on Base44 | Done (`public/icons/`) |
+| App icons (192, 512, maskable) as real files in the repo | Done (`public/icons/`) |
 | Web app manifest with id, scope, maskable icon, shortcuts | Done |
 | Service worker + offline page | Done (`public/sw.js`) |
 | Public **Delete account** page (Google asks for this URL) | Done: `/delete-account`, also linked in the footer |
@@ -22,9 +22,8 @@ Your app is a website, so it goes to Play as a **Trusted Web Activity (TWA)**: a
 
 1. **Business details**: open `src/lib/businessInfo.js`; no value should start with `[`. Phone/e-mail/address must match what you enter in Play Console.
 2. **Phone screenshots**: at least 2 (Play wants 2–8), real screens, 16:9 or 9:16, min 320 px. Suggested: Home, Services list, Apply (documents step), Pay screen, Application timeline with an update, Book appointment, Membership card, Orders. Take them on your phone from the live site. Do not show real customers' personal data.
-3. **Images hosted on Base44** still in the code: the UPI QR in `src/pages/Pay.jsx` (`QR_IMAGE`) and the three logo URLs in `src/components/Logo.jsx`. If Base44 is ever switched off these break. Save them into `public/` and point the code to `/yourfile.png`.
-4. **A test login for Google's reviewers** (see section 6, "App access"). Create a normal account, verify it, give it a password, and make sure it has at least one sample application.
-5. Never use the national emblem, Ashoka Chakra, tricolour as a logo, or wording like "official". Your app does not, keep it that way.
+3. **A test login for Google's reviewers** (see section 6, "App access"). Create a normal account, verify it, give it a password, and make sure it has at least one sample application.
+4. Never use the national emblem, Ashoka Chakra, tricolour as a logo, or wording like "official". Your app does not, keep it that way.
 
 ## 3. Policy risks and how this app handles them
 
@@ -74,23 +73,14 @@ Privacy policy and terms are available inside the app.
 **Tags:** documents, services, applications
 **Contact email:** your support email · **Phone:** 8374968022 · **Website:** your Vercel/own domain
 
-## 5. Build the Android app (no coding)
+## 5. Build the Android app (no third-party site)
 
-You need: a Google Play developer account ($25 one-time fee) and your live site address (a custom domain is better than `*.vercel.app`, but both work).
+The project is in the `android/` folder. Follow **`android/BUILD-AAB.md`**: you install Android Studio (Google), set your site address in one line, and create the `.aab` and your signing key on your own computer. Then:
 
-1. Push this update to GitHub and wait for Vercel to show **Ready**. Open `https://YOUR-SITE/manifest.json` and `https://YOUR-SITE/icons/icon-512.png` in a browser to confirm both load.
-2. Go to **https://www.pwabuilder.com**, paste your site address, press **Start**. Fix anything it flags in red (the checks for manifest and service worker should pass).
-3. Press **Package for stores → Android → Generate**. Settings:
-   - **Package ID:** `in.docufastindia.app` (can be changed, but it must be the same in assetlinks and Play Console and can never change after publishing)
-   - App name: `DocuFast India`; launcher name `DocuFast`
-   - Version 1, Version code 1
-   - Signing key: choose **"Create new"**. 
-   - Notifications / location delegation: leave **location delegation ON** (so "Use my location" works inside the app).
-4. Download the zip. It contains `.aab` (the file you upload), `signing.keystore` + `signing-key-info.txt` (**back these up in 2 places and never lose or share them**), and a sample `assetlinks.json`.
-5. Create the developer account at https://play.google.com/console and finish identity verification (can take a few days).
-6. **Create app** → name DocuFast India → App → Free → accept declarations.
-7. Upload the `.aab` (see step 8 for which release track) and accept **Play App Signing** (recommended; keep the default).
-8. **Verify the app (removes the browser bar):** Play Console → *Test and release → App integrity → App signing* → copy the **SHA-256 certificate fingerprint** of the *App signing key*. Also copy the SHA-256 of the *Upload key* (or from `signing-key-info.txt`). Put **both** into `public/.well-known/assetlinks.json` (replace the two `REPLACE_…` lines), push to GitHub, wait for Vercel, then open `https://YOUR-SITE/.well-known/assetlinks.json` to confirm it shows. If you skip this the app still works but shows a URL bar on top and reviewers may flag it.
+1. Create the developer account at https://play.google.com/console ($25 one-time) and finish identity verification (can take a few days).
+2. **Create app** → name DocuFast India → App → Free → accept declarations.
+3. Upload the `.aab` (see section 8 for which release track) and accept **Play App Signing**.
+4. **Verify the app (removes the browser bar):** Play Console → *Test and release → App integrity → App signing* → copy the SHA-256 of the app signing key; also your upload key's SHA-256. Put both into `public/.well-known/assetlinks.json`, push to GitHub, wait for Vercel, and open `https://YOUR-SITE/.well-known/assetlinks.json` to confirm.
 
 ## 6. Play Console forms (answers)
 

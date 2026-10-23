@@ -45,7 +45,6 @@ import AppointmentDetail from '@/pages/AppointmentDetail';
 
 // Admin pages
 import AdminDashboard from '@/pages/admin/AdminDashboard';
-import AdminApplications from '@/pages/admin/AdminApplications';
 import ServiceEditor from '@/pages/admin/ServiceEditor';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import AdminPayments from '@/pages/admin/AdminPayments';
@@ -112,7 +111,7 @@ const AuthenticatedApp = () => {
         <Route path="/profile" element={<Profile />} />
         <Route element={<AdminRoute />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/admin-applications" element={<AdminApplications />} />
+          <Route path="/admin-applications" element={<Navigate to="/admin-orders" replace />} />
           <Route path="/service-editor" element={<ServiceEditor />} />
           <Route path="/admin-users" element={<AdminUsers />} />
           <Route path="/admin-payments" element={<AdminPayments />} />

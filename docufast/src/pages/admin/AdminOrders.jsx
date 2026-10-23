@@ -4,10 +4,19 @@ import { Search, Package, Loader2 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { addressLines, inr, when } from "@/lib/orders";
 
-const TABS = [["New", (a) => !a.admin_seen_at], ["In progress", (a) => ["Submitted", "Under Review", "Action Required", "Approved"].includes(a.status)], ["Completed", (a) => a.status === "Completed"], ["All", () => true]];
+const PAID = (a) => a.status !== "Draft";
+const TABS = [
+  ["New", (a) => PAID(a) && !a.admin_seen_at],
+  ["In progress", (a) => ["Submitted", "Under Review", "Approved"].includes(a.status)],
+  ["Action Required", (a) => a.status === "Action Required"],
+  ["Completed", (a) => a.status === "Completed"],
+  ["Rejected / Cancelled", (a) => ["Rejected", "Cancelled"].includes(a.status)],
+  ["Unpaid", (a) => a.status === "Draft"],
+  ["All", PAID],
+];
 
 export default function AdminOrders() {
   const [apps, setApps] = useState([]);
@@ -17,14 +26,14 @@ export default function AdminOrders() {
   const [q, setQ] = useState("");
 
   const load = async () => {
-    const [a, p] = await Promise.all([base44.entities.Application.list("-created_date", 300), base44.entities.Payment.list("-created_date", 300)]);
-    setApps(a.filter((x) => x.status !== "Draft"));
+    const [a, p] = await Promise.all([backend.entities.Application.list("-created_date", 300), backend.entities.Payment.list("-created_date", 300)]);
+    setApps(a);
     setPays(Object.fromEntries(p.map((x) => [x.application_id, x])));
   };
   useEffect(() => {
     load().catch(() => {}).finally(() => setLoading(false));
-    const o1 = base44.entities.Application.subscribe(() => load().catch(() => {}));
-    const o2 = base44.entities.Payment.subscribe(() => load().catch(() => {}));
+    const o1 = backend.entities.Application.subscribe(() => load().catch(() => {}));
+    const o2 = backend.entities.Payment.subscribe(() => load().catch(() => {}));
     return () => { o1 && o1(); o2 && o2(); };
   }, []);
 
@@ -53,7 +62,7 @@ export default function AdminOrders() {
         {loading ? (
           <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
         ) : list.length === 0 ? (
-          <EmptyState icon={Package} title="No orders here" description="Paid applications appear here as orders." />
+          <EmptyState icon={Package} title="No orders here" description="Paid applications appear here as orders. Applications not yet paid are under Unpaid." />
         ) : (
           list.map((a) => {
             const p = pays[a.id];

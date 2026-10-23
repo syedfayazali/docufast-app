@@ -3,7 +3,7 @@ import { Bell } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import EmptyState from "@/components/EmptyState";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 import { fmtFull } from "@/lib/appointments";
 
@@ -41,9 +41,9 @@ export default function Notifications() {
   useEffect(() => {
     if (!user) return;
     Promise.all([
-      base44.entities.Application.filter({ created_by_id: user.id }, "-updated_date"),
-      base44.entities.Appointment.filter({ created_by_id: user.id }, "-updated_date", 20).catch(() => []),
-      base44.entities.ApplicationUpdate.list("-created_date", 30).catch(() => []),
+      backend.entities.Application.filter({ created_by_id: user.id }, "-updated_date"),
+      backend.entities.Appointment.filter({ created_by_id: user.id }, "-updated_date", 20).catch(() => []),
+      backend.entities.ApplicationUpdate.list("-created_date", 30).catch(() => []),
     ])
       .then(([apps, appts, ups]) => {
         const byId = Object.fromEntries(apps.map((a) => [a.id, a]));

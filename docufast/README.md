@@ -1,23 +1,23 @@
 # DocuFast India — setup, payments & deployment guide
 
-Your Base44 export, now running on its own backend:
+How the app is put together:
 
-| Part | Was (Base44) | Now |
-|---|---|---|
-| Database, login, file storage | Base44 | **Supabase** (free tier is enough to start) |
-| Online payments | manual UPI QR + screenshot | **Cashfree** (UPI, cards, net banking, wallets) + the old QR kept as a fallback |
-| Hosting | Base44 | **Vercel**, deployed from **GitHub** |
+| Part | Service |
+|---|---|
+| Database, login, file storage | **Supabase** (free tier is enough to start) |
+| Online payments | **Cashfree** (UPI, cards, net banking) + a manual UPI QR fallback |
+| Hosting | **Vercel**, deployed from **GitHub** |
 
-The pages are unchanged. `src/api/base44Client.js` keeps the same interface the pages already call
-(`base44.entities.Service.list()`, `base44.auth.me()` …) but now talks to Supabase.
-Payment endpoints live in `/api` as Vercel serverless functions.
+The pages call `src/api/backend.js`, a small adapter on top of Supabase
+(`backend.entities.Service.list()`, `backend.auth.me()` …).
+Payment and e-mail endpoints live in `/api` as Vercel serverless functions.
 
 ```
 src/            React app (pages, components)
-src/api/        Supabase adapter (replaces the Base44 SDK)
-api/            Serverless functions: create-order, verify-payment, cashfree-webhook
-supabase/       schema.sql  ← run once in Supabase
-legacy-base44/  your old entity definitions, kept only for reference
+src/api/        Supabase adapter
+api/            Serverless functions: payments, e-mails
+supabase/       schema.sql  ← run once in Supabase (+ migration files for updates)
+android/        Android Studio project that wraps the site for Google Play
 ```
 
 ---
@@ -125,24 +125,7 @@ vercel dev                        # http://localhost:3000 — site + /api togeth
    Log out and in again → you'll land on the Admin Dashboard.
 3. **Your services/categories/banners:** the schema deliberately ships empty (no made-up prices).
    - Fastest: in Admin → **Service Editor** add your categories and services.
-   - Or import from Base44: export each entity as CSV from the Base44 dashboard, then Supabase → **Table Editor → services / categories / banners → Insert → Import data from CSV.** Column names are identical, so it maps automatically.
-   - Old Base44 **users and applications can't be migrated with working logins** (passwords are not exportable) — customers re-register.
-4. Application/payment history from Base44 can be imported the same way into `applications` / `payments` if you want the records, but their `created_by_id` won't match new accounts.
-
----
-
-## 5. Images hosted on Base44 — copy them out
-
-Four images still load from `media.base44.com`. If your Base44 app is ever deleted they will disappear. Download them and put them in `public/`, then update the URLs:
-
-| File | What |
-|---|---|
-| `src/components/Logo.jsx` (3 URLs) | logos |
-| `index.html`, `public/manifest.json` | favicon / app icon |
-| `src/pages/Pay.jsx` → `QR_IMAGE` | your UPI QR |
-
-Example: save the QR as `public/upi-qr.png` and set `const QR_IMAGE = "/upi-qr.png";`.
-Banner images you upload from now on are stored in Supabase automatically.
+   - Or import a CSV: Supabase → **Table Editor → services / categories / banners → Insert → Import data from CSV.** Column names must match the table.
 
 ---
 

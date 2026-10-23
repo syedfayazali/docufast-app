@@ -1,17 +1,14 @@
 /**
- * Backend adapter.
+ * Backend adapter: one small API the pages use (backend.entities.X.list(), backend.auth.me(), ...)
+ * on top of Supabase (Postgres + Auth + Storage).
  *
- * The pages were generated against the Base44 SDK (base44.entities.X.list(),
- * base44.auth.me(), ...). This file keeps that exact interface but talks to
- * Supabase (Postgres + Auth + Storage), so no page needed rewriting.
- *
- *   Base44 entity  ->  Supabase table
- *   Service        ->  services
- *   Category       ->  categories
- *   Banner         ->  banners
- *   Application    ->  applications
- *   Payment        ->  payments
- *   User           ->  profiles
+ *   Entity       ->  Supabase table
+ *   Service      ->  services
+ *   Category     ->  categories
+ *   Banner       ->  banners
+ *   Application  ->  applications
+ *   Payment      ->  payments
+ *   User         ->  profiles
  */
 import { supabase } from '@/lib/supabase';
 
@@ -289,5 +286,5 @@ const appointments = {
   },
 };
 
-export const base44 = { entities, auth, integrations: { Core }, appointments };
-export default base44;
+export const backend = { entities, auth, integrations: { Core }, appointments };
+export default backend;

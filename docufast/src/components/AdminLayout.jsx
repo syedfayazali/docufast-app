@@ -1,13 +1,12 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, FileText, Settings, Users, CreditCard, ArrowLeft, Calendar, Package } from "lucide-react";
+import { LayoutDashboard, Settings, Users, CreditCard, ArrowLeft, Calendar, Package } from "lucide-react";
 import Logo from "@/components/Logo";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/admin-dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/admin-orders", label: "Orders", icon: Package },
-  { to: "/admin-applications", label: "Apps", icon: FileText },
   { to: "/service-editor", label: "Services", icon: Settings },
   { to: "/admin-users", label: "Users", icon: Users },
   { to: "/admin-appointments", label: "Bookings", icon: Calendar },

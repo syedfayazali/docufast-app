@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import EmptyState from "@/components/EmptyState";
 import { Search, CreditCard, TrendingUp, ShieldCheck, X, Eye } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { Image } from "@/components/ui/image";
 
 const fmtDate = (d) =>
@@ -20,14 +20,14 @@ export default function AdminPayments() {
 
   useEffect(() => {
     setLoading(true);
-    base44.entities.Payment.list("-created_date", 200)
+    backend.entities.Payment.list("-created_date", 200)
       .then(setPayments)
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const reload = () => {
-    base44.entities.Payment.list("-created_date", 200).then(setPayments).catch(() => {});
+    backend.entities.Payment.list("-created_date", 200).then(setPayments).catch(() => {});
   };
 
   const filtered = payments.filter((p) => {
@@ -56,7 +56,7 @@ export default function AdminPayments() {
       return;
     }
     try {
-      const res = await base44.integrations.Core.CreateFileSignedUrl({
+      const res = await backend.integrations.Core.CreateFileSignedUrl({
         file_uri: p.payment_proof_uri,
       });
       if (res?.signed_url) {
@@ -68,9 +68,9 @@ export default function AdminPayments() {
   const setPaymentStatus = async (p, status, appStatus) => {
     setBusy(p.id);
     try {
-      await base44.entities.Payment.update(p.id, { status });
+      await backend.entities.Payment.update(p.id, { status });
       if (appStatus && p.application_id) {
-        await base44.entities.Application
+        await backend.entities.Application
           .update(p.application_id, { status: appStatus })
           .catch(() => {});
       }

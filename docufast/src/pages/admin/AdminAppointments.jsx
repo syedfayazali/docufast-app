@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Phone, MapPin, Loader2, Save } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { notifyAppointment } from "@/lib/appointments";
 import { fmtTime, fmtFull, todayIST, addDays, DAY_NAMES, statusTone } from "@/lib/appointments";
 import { cn } from "@/lib/utils";
@@ -22,20 +22,20 @@ export default function AdminAppointments() {
   const [holiday, setHoliday] = useState("");
 
   const load = async () => {
-    setRows(await base44.entities.Appointment.list("slot_start", 500));
+    setRows(await backend.entities.Appointment.list("slot_start", 500));
   };
 
   useEffect(() => {
-    Promise.all([load(), base44.entities.AppointmentSettings.get("main").then(setS)])
+    Promise.all([load(), backend.entities.AppointmentSettings.get("main").then(setS)])
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-    return base44.entities.Appointment.subscribe(() => load().catch(() => {}));
+    return backend.entities.Appointment.subscribe(() => load().catch(() => {}));
   }, []);
 
   const setStatus = async (a, status) => {
     setBusy(a.id); setError("");
     try {
-      await base44.entities.Appointment.update(a.id, { status });
+      await backend.entities.Appointment.update(a.id, { status });
       await notifyAppointment(a.id, { Completed: "completed", Cancelled: "cancelled", "No Show": "no_show" }[status]);
       await load();
     } catch (e) { setError(e.message); }
@@ -44,7 +44,7 @@ export default function AdminAppointments() {
 
   const saveNote = async (a, admin_note) => {
     if ((a.admin_note || "") === admin_note) return;
-    try { await base44.entities.Appointment.update(a.id, { admin_note }); await load(); } catch (e) { setError(e.message); }
+    try { await backend.entities.Appointment.update(a.id, { admin_note }); await load(); } catch (e) { setError(e.message); }
   };
 
   const today = todayIST();
@@ -65,7 +65,7 @@ export default function AdminAppointments() {
       payload.location = payload.location || null;
       payload.note = payload.note || null;
       for (const k of ["slot_minutes", "capacity", "advance_days", "min_notice_hours", "cancel_before_hours", "max_active_per_customer"]) payload[k] = Number(payload[k]);
-      setS(await base44.entities.AppointmentSettings.update("main", payload));
+      setS(await backend.entities.AppointmentSettings.update("main", payload));
       setSaved(true);
     } catch (e) { setError(e.message); }
     finally { setSaving(false); }

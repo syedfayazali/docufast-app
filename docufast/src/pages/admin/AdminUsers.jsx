@@ -3,7 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
 import { Search, Users, ChevronDown, Mail, Calendar } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
@@ -16,8 +16,8 @@ export default function AdminUsers() {
 
   useEffect(() => {
     Promise.all([
-      base44.entities.User.list().catch(() => []),
-      base44.entities.Application.list("-created_date", 200).catch(() => []),
+      backend.entities.User.list().catch(() => []),
+      backend.entities.Application.list("-created_date", 200).catch(() => []),
     ]).then(([u, a]) => {
       setUsers(u);
       const map = {};

@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import StatusBadge from "@/components/StatusBadge";
 import { useToast } from "@/components/ui/use-toast";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import DocumentLink from "@/components/DocumentLink";
 import UpdateCard, { useApplicationUpdates, stepForStatus } from "@/components/UpdatesPanel";
 
@@ -22,14 +22,14 @@ export default function ApplicationDetail() {
   const { items: updates, fresh } = useApplicationUpdates(id);
 
   useEffect(() => {
-    base44.entities.Application.get(id)
+    backend.entities.Application.get(id)
       .then((a) => { setApp(a); prevStatus.current = a?.status; })
       .catch(() => {})
       .finally(() => setLoading(false));
-    base44.entities.Payment.filter({ application_id: id }).then((p) => setPayment(p[0] || null)).catch(() => {});
+    backend.entities.Payment.filter({ application_id: id }).then((p) => setPayment(p[0] || null)).catch(() => {});
 
     // Live updates: status refreshes instantly when admin changes it (no manual refresh needed)
-    const unsubscribe = base44.entities.Application.subscribe((event) => {
+    const unsubscribe = backend.entities.Application.subscribe((event) => {
       if (event.id !== id) return;
       const rec = event.data;
       if (!rec) return;

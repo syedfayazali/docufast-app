@@ -4,7 +4,7 @@ import { ArrowLeft, CheckCircle2, Clock, ShieldCheck, FileText, UserCheck, Arrow
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 
 const processSteps = [
   "Submit application",
@@ -22,7 +22,7 @@ export default function ServiceDetail() {
   const [loading, setLoading] = useState(true);
 
   React.useEffect(() => {
-    base44.entities.Service.get(id)
+    backend.entities.Service.get(id)
       .then((s) => setService(s))
       .catch(() => setService(null))
       .finally(() => setLoading(false));

@@ -16,7 +16,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { uploadAvatar } from "@/lib/avatar";
@@ -38,7 +38,7 @@ export default function Profile() {
     : menu;
 
   const handleLogout = async () => {
-    await base44.auth.logout();
+    await backend.auth.logout();
     window.location.href = "/login";
   };
 
@@ -74,7 +74,7 @@ export default function Profile() {
         message: "ACCOUNT DELETION REQUEST. Please delete my account and personal data. Account id: " + (user?.id || ""),
       });
       if (error) throw error;
-      await base44.auth.logout();
+      await backend.auth.logout();
       window.location.href = "/login";
     } catch {
       setDeleting(false);

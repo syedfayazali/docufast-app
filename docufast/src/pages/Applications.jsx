@@ -6,7 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import StatusBadge, { statusLabel } from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
 import { useToast } from "@/components/ui/use-toast";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 
 const filters = ["All", "Draft", "Submitted", "Under Review", "Action Required", "Completed", "Rejected"];
@@ -37,7 +37,7 @@ export default function Applications() {
 
   useEffect(() => {
     if (!user) return;
-    base44.entities.Application.filter({ created_by_id: user.id }, "-created_date")
+    backend.entities.Application.filter({ created_by_id: user.id }, "-created_date")
       .then((rows) => {
         setApps(rows);
         rows.forEach((r) => { prevStatus.current[r.id] = r.status; });
@@ -46,7 +46,7 @@ export default function Applications() {
       .finally(() => setLoading(false));
 
     // Live updates: refresh instantly whenever an application changes (no pull-to-refresh needed)
-    const unsubscribe = base44.entities.Application.subscribe((event) => {
+    const unsubscribe = backend.entities.Application.subscribe((event) => {
       const rec = event.data;
       if (!rec || rec.created_by_id !== user.id) return;
       if (event.type === "delete") {

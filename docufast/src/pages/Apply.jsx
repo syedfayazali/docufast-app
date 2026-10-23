@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, Upload, X, FileText } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 import AddressPicker, { addressToFormFields } from "@/components/AddressPicker";
 
@@ -47,12 +47,12 @@ export default function Apply() {
   const addressChosen = React.useRef(false);
 
   React.useEffect(() => {
-    base44.entities.Service.get(serviceId).then(setService).catch(() => {});
+    backend.entities.Service.get(serviceId).then(setService).catch(() => {});
   }, [serviceId]);
 
   React.useEffect(() => {
     if (!user) return;
-    base44.entities.Application.filter({ created_by_id: user.id }, "-created_date", 1)
+    backend.entities.Application.filter({ created_by_id: user.id }, "-created_date", 1)
       .then((rows) => {
         const prev = (Array.isArray(rows) ? rows[0] : rows?.items?.[0]) || null;
         const saved = pickSavedDetails(prev);
@@ -131,12 +131,12 @@ export default function Apply() {
       // Tidy up: remove this customer's earlier unpaid drafts for the same service
       // (only ones where no payment was ever attempted).
       try {
-        const old = await base44.entities.Application.filter({ created_by_id: user.id, service_id: serviceId, status: "Draft" });
+        const old = await backend.entities.Application.filter({ created_by_id: user.id, service_id: serviceId, status: "Draft" });
         for (const o of old) {
-          const pays = await base44.entities.Payment.filter({ application_id: o.id });
+          const pays = await backend.entities.Payment.filter({ application_id: o.id });
           if (pays.some((p) => p.razorpay_order_id || p.utr || p.payment_proof_uri || p.status !== "Pending")) continue;
-          for (const p of pays) await base44.entities.Payment.delete(p.id);
-          await base44.entities.Application.delete(o.id);
+          for (const p of pays) await backend.entities.Payment.delete(p.id);
+          await backend.entities.Application.delete(o.id);
         }
       } catch {
         /* not critical */
@@ -146,10 +146,10 @@ export default function Apply() {
       const docPaths = {};
       for (const [label, file] of Object.entries(files)) {
         if (!file || !docs[label]) continue;
-        const up = await base44.integrations.Core.UploadPrivateFile({ file, folder: "documents" });
+        const up = await backend.integrations.Core.UploadPrivateFile({ file, folder: "documents" });
         docPaths[label] = up.file_uri;
       }
-      const app = await base44.entities.Application.create({
+      const app = await backend.entities.Application.create({
         reference: ref,
         service_id: serviceId,
         service_name: service?.name || "",
@@ -166,7 +166,7 @@ export default function Apply() {
         total,
         appointment_required: !!service?.appointment_required,
       });
-      await base44.entities.Payment.create({
+      await backend.entities.Payment.create({
         reference: `PAY-${Date.now().toString().slice(-6)}`,
         application_id: app.id,
         application_ref: ref,

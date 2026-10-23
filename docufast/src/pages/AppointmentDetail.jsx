@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, Loader2, Printer, CalendarPlus, MapPin, Phone } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 import { fmtFull, fmtTime, canChange, statusTone, downloadIcs, notifyAppointment } from "@/lib/appointments";
 import { cn } from "@/lib/utils";
@@ -28,8 +28,8 @@ export default function AppointmentDetail() {
 
   const load = async () => {
     const [row, st] = await Promise.all([
-      base44.entities.Appointment.get(id),
-      base44.entities.AppointmentSettings.get("main").catch(() => null),
+      backend.entities.Appointment.get(id),
+      backend.entities.AppointmentSettings.get("main").catch(() => null),
     ]);
     setA(row); setS(st);
   };
@@ -39,7 +39,7 @@ export default function AppointmentDetail() {
     if (!window.confirm("Cancel this appointment?")) return;
     setBusy(true); setErr("");
     try {
-      await base44.entities.Appointment.update(a.id, { status: "Cancelled" });
+      await backend.entities.Appointment.update(a.id, { status: "Cancelled" });
       await notifyAppointment(a.id, "cancelled");
       await load();
     } catch (e) { setErr(e.message); } finally { setBusy(false); }

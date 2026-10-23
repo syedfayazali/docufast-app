@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 import { fmtFull } from "@/lib/appointments";
 
@@ -40,16 +40,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!user) return;
-    base44.entities.Application.filter({ created_by_id: user.id }, "-created_date")
+    backend.entities.Application.filter({ created_by_id: user.id }, "-created_date")
       .then(setApps)
       .catch(() => {})
       .finally(() => setLoading(false));
     const loadAppts = () =>
-      base44.entities.Appointment.filter({ created_by_id: user.id, status: "Booked" }, "slot_start", 20)
+      backend.entities.Appointment.filter({ created_by_id: user.id, status: "Booked" }, "slot_start", 20)
         .then((r) => setAppts(r.filter((x) => new Date(x.slot_end).getTime() > Date.now()).slice(0, 3)))
         .catch(() => {});
     loadAppts();
-    return base44.entities.Appointment.subscribe(loadAppts);
+    return backend.entities.Appointment.subscribe(loadAppts);
   }, [user]);
 
   const activeApps = apps.filter((a) => !["Completed", "Rejected", "Cancelled"].includes(a.status));

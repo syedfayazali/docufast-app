@@ -6,7 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import ServiceCard from "@/components/ServiceCard";
 import EmptyState from "@/components/EmptyState";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { Image } from "@/components/ui/image";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -24,10 +24,10 @@ export default function Home() {
   const [banner, setBanner] = useState(null);
   const { isAuthenticated } = useAuth();
   React.useEffect(() => {
-    base44.entities.Service.list("display_order", 50)
+    backend.entities.Service.list("display_order", 50)
       .then(setServices)
       .catch(() => setServices([]));
-    base44.entities.Banner.filter({ active: true }, "-display_order", 1)
+    backend.entities.Banner.filter({ active: true }, "-display_order", 1)
       .then((rows) => setBanner(rows[0] || null))
       .catch(() => {});
   }, []);

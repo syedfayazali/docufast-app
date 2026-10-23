@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Upload, Check, Loader2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 
 export default function PaymentProofForm({ onSubmit, submitting }) {
   const [file, setFile] = useState(null);
@@ -20,7 +20,7 @@ export default function PaymentProofForm({ onSubmit, submitting }) {
     }
     setUploading(true);
     try {
-      const res = await base44.integrations.Core.UploadPrivateFile({ file });
+      const res = await backend.integrations.Core.UploadPrivateFile({ file });
       const fileUri = res?.file_uri;
       if (!fileUri) throw new Error("Upload failed");
       setUploading(false);

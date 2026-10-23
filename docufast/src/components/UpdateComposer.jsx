@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Loader2, Trash2, Lock, Send } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { supabase } from "@/lib/supabase";
 
 const field = "w-full rounded-xl border border-border bg-white px-3 py-2 text-sm outline-none focus:border-gold";
@@ -29,7 +29,7 @@ export default function UpdateComposer({ application }) {
   const [err, setErr] = useState("");
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }));
 
-  const load = () => base44.entities.ApplicationUpdate.filter({ application_id: application.id }, "-created_date", 50).then(setList).catch(() => {});
+  const load = () => backend.entities.ApplicationUpdate.filter({ application_id: application.id }, "-created_date", 50).then(setList).catch(() => {});
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [application.id]);
 
   const post = async () => {
@@ -38,7 +38,7 @@ export default function UpdateComposer({ application }) {
     if (f.link.trim() && !/^https?:\/\//i.test(f.link.trim())) return setErr("The link must start with http:// or https://");
     setBusy(true);
     try {
-      const row = await base44.entities.ApplicationUpdate.create({
+      const row = await backend.entities.ApplicationUpdate.create({
         application_id: application.id,
         title: f.title.trim() || null,
         ref_label: f.ref_label.trim() || null,
@@ -61,7 +61,7 @@ export default function UpdateComposer({ application }) {
 
   const remove = async (id) => {
     if (!window.confirm("Delete this update? The customer will no longer see it.")) return;
-    try { await base44.entities.ApplicationUpdate.delete(id); load(); } catch (e) { setErr(e.message); }
+    try { await backend.entities.ApplicationUpdate.delete(id); load(); } catch (e) { setErr(e.message); }
   };
 
   return (

@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -16,7 +16,7 @@ export default function Payments() {
 
   useEffect(() => {
     if (!user) return;
-    base44.entities.Payment.filter({ created_by_id: user.id }, "-created_date")
+    backend.entities.Payment.filter({ created_by_id: user.id }, "-created_date")
       .then(setPayments)
       .catch(() => {})
       .finally(() => setLoading(false));

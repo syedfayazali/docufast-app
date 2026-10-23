@@ -4,7 +4,7 @@ import { Calendar, MapPin, Phone, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import EmptyState from "@/components/EmptyState";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 import { fmtFull, canChange, statusTone, notifyAppointment } from "@/lib/appointments";
 import { cn } from "@/lib/utils";
@@ -19,8 +19,8 @@ export default function MyAppointments() {
 
   const load = async () => {
     const [a, s] = await Promise.all([
-      base44.entities.Appointment.filter({ created_by_id: user.id }, "-slot_start", 100),
-      base44.entities.AppointmentSettings.get("main").catch(() => null),
+      backend.entities.Appointment.filter({ created_by_id: user.id }, "-slot_start", 100),
+      backend.entities.AppointmentSettings.get("main").catch(() => null),
     ]);
     setRows(a);
     setSettings(s);
@@ -29,7 +29,7 @@ export default function MyAppointments() {
   useEffect(() => {
     if (!user) return;
     load().catch((e) => setError(e.message)).finally(() => setLoading(false));
-    const off = base44.entities.Appointment.subscribe(() => load().catch(() => {}));
+    const off = backend.entities.Appointment.subscribe(() => load().catch(() => {}));
     return off;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -37,7 +37,7 @@ export default function MyAppointments() {
   const cancel = async (a) => {
     if (!window.confirm("Cancel this appointment?")) return;
     setBusy(a.id); setError("");
-    try { await base44.entities.Appointment.update(a.id, { status: "Cancelled" }); await notifyAppointment(a.id, "cancelled"); await load(); }
+    try { await backend.entities.Appointment.update(a.id, { status: "Cancelled" }); await notifyAppointment(a.id, "cancelled"); await load(); }
     catch (e) { setError(e.message); }
     finally { setBusy(""); }
   };

@@ -1,12 +1,8 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-const FULL_LOGO =
-  "https://media.base44.com/images/public/6a99a28a5cee4eafc7da7547/3ffd6ce0e_WhatsAppImage2026-08-06at40551PM.jpeg";
 // Your logo icon: a transparent PNG saved at public/logo-icon.png
 const ICON_MARK = "/logo-icon.png";
-const WIDE_LOGO =
-  "https://media.base44.com/images/public/6a99a28a5cee4eafc7da7547/e11de1327_WhatsApp_Image_2026-10-13_at_104818_AM.jpeg";
 
 export default function Logo({ className, variant = "dark", showText = true, height = 40, showName = true, nameSize = 18 }) {
   const isLight = variant === "light";
@@ -44,11 +40,21 @@ export default function Logo({ className, variant = "dark", showText = true, hei
     );
   }
 
-  // Light backgrounds: full lockup or icon mark
-  const src = showText ? FULL_LOGO : ICON_MARK;
+  // Light backgrounds: [icon in white round frame] + [brand name]
   return (
     <div className={cn("flex items-center", className)}>
-      <img src={WIDE_LOGO} alt="DocuFast India" style={{ height }} className="w-auto" />
+      <span
+        className="flex shrink-0 items-center justify-center rounded-full border border-border shadow-sm"
+        style={{ backgroundColor: "#ffffff", height, width: height, padding: 4 }}
+      >
+        <img src={ICON_MARK} alt="DocuFast India" className="h-full w-full rounded-full object-contain" />
+      </span>
+      {showName && (
+        <span className="ml-2.5 whitespace-nowrap font-heading font-bold leading-none tracking-tight text-navy" style={{ fontSize: `${nameSize}px` }}>
+          DocuFast India
+          <sup style={{ color: "#F5A623", fontSize: `${Math.round(nameSize * 0.6)}px`, marginLeft: "2px" }}>™</sup>
+        </span>
+      )}
     </div>
   );
 }

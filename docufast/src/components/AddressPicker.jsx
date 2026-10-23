@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { MapPin, Plus, Trash2, Pencil, Check, Loader2, LocateFixed, Home, Briefcase } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 
 const LABELS = [
@@ -68,7 +68,7 @@ export default function AddressPicker({ selectedId, onSelect, selectable = true 
   const load = useCallback(async () => {
     if (!user) return [];
     try {
-      const rows = await base44.entities.Address.filter({ created_by_id: user.id }, "-created_date", 30);
+      const rows = await backend.entities.Address.filter({ created_by_id: user.id }, "-created_date", 30);
       const sorted = [...rows].sort((a, b) => Number(b.is_default) - Number(a.is_default));
       setItems(sorted);
       return sorted;
@@ -166,8 +166,8 @@ export default function AddressPicker({ selectedId, onSelect, selectable = true 
         return;
       }
       let saved;
-      if (editing.id) saved = await base44.entities.Address.update(editing.id, payload);
-      else saved = await base44.entities.Address.create({ ...payload, is_default: items.length === 0 });
+      if (editing.id) saved = await backend.entities.Address.update(editing.id, payload);
+      else saved = await backend.entities.Address.create({ ...payload, is_default: items.length === 0 });
       const rows = await load();
       setEditing(null);
       if (selectable) onSelect?.(rows.find((r) => r.id === saved.id) || saved);
@@ -180,9 +180,9 @@ export default function AddressPicker({ selectedId, onSelect, selectable = true 
   const remove = async (a) => {
     setBusy(true);
     try {
-      await base44.entities.Address.delete(a.id);
+      await backend.entities.Address.delete(a.id);
       const rows = await load();
-      if (a.is_default && rows[0]) await base44.entities.Address.update(rows[0].id, { is_default: true }).then(load);
+      if (a.is_default && rows[0]) await backend.entities.Address.update(rows[0].id, { is_default: true }).then(load);
       if (selectable && selectedId === a.id) onSelect?.(rows[0] || null);
     } catch {
       setError("Could not delete the address.");
@@ -193,8 +193,8 @@ export default function AddressPicker({ selectedId, onSelect, selectable = true 
   const makeDefault = async (a) => {
     setBusy(true);
     try {
-      for (const o of items) if (o.is_default && o.id !== a.id) await base44.entities.Address.update(o.id, { is_default: false });
-      await base44.entities.Address.update(a.id, { is_default: true });
+      for (const o of items) if (o.is_default && o.id !== a.id) await backend.entities.Address.update(o.id, { is_default: false });
+      await backend.entities.Address.update(a.id, { is_default: true });
       await load();
     } catch {
       setError("Could not change the default address.");

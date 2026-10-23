@@ -6,7 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import ServiceCard from "@/components/ServiceCard";
 import EmptyState from "@/components/EmptyState";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 
 const defaultFilters = ["All", "Certificates", "Passport", "Deeds", "Government Documents", "Other"];
 
@@ -18,10 +18,10 @@ export default function Services() {
   const [filters, setFilters] = useState(defaultFilters);
 
   React.useEffect(() => {
-    base44.entities.Service.list("display_order", 100)
+    backend.entities.Service.list("display_order", 100)
       .then(setServices)
       .catch(() => setServices([]));
-    base44.entities.Category.list("display_order", 100)
+    backend.entities.Category.list("display_order", 100)
       .then((rows) => {
         const cats = rows.filter((c) => c.active).map((c) => c.name);
         setFilters(cats.length ? ["All", ...cats] : defaultFilters);

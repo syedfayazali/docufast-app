@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { Plus, Pencil, Check, Loader2, Trash2, LayoutGrid, X } from "lucide-react";
 
 const empty = {
@@ -23,10 +23,10 @@ export default function ServiceEditor() {
   const [msg, setMsg] = useState("");
 
   const load = () => {
-    base44.entities.Service.list("display_order", 100)
+    backend.entities.Service.list("display_order", 100)
       .then(setServices)
       .catch(() => setServices([]));
-    base44.entities.Category.list("display_order", 100)
+    backend.entities.Category.list("display_order", 100)
       .then((rows) => setCategories(rows.filter((c) => c.active).map((c) => c.name)))
       .catch(() => setCategories([]));
   };
@@ -55,7 +55,7 @@ export default function ServiceEditor() {
     }
     setCatSaving(true); setMsg("");
     try {
-      await base44.entities.Category.create({ name, display_order: (categories?.length || 0), active: true });
+      await backend.entities.Category.create({ name, display_order: (categories?.length || 0), active: true });
       setNewCat("");
       load();
     } catch (err) {
@@ -68,8 +68,8 @@ export default function ServiceEditor() {
   const removeCategory = async (name) => {
     if (!confirm(`Delete category "${name}"? Existing services will keep their current category.`)) return;
     try {
-      const recs = await base44.entities.Category.filter({ name });
-      await Promise.all(recs.map((r) => base44.entities.Category.delete(r.id)));
+      const recs = await backend.entities.Category.filter({ name });
+      await Promise.all(recs.map((r) => backend.entities.Category.delete(r.id)));
       load();
     } catch (err) {
       setMsg(err.message || "Failed to delete category.");
@@ -90,10 +90,10 @@ export default function ServiceEditor() {
         requirements: form.requirements.split("\n").map((r) => r.trim()).filter(Boolean),
       };
       if (editingId) {
-        await base44.entities.Service.update(editingId, payload);
+        await backend.entities.Service.update(editingId, payload);
         setMsg("Service updated successfully.");
       } else {
-        await base44.entities.Service.create(payload);
+        await backend.entities.Service.create(payload);
         setMsg("Service created successfully.");
       }
       reset();
@@ -107,7 +107,7 @@ export default function ServiceEditor() {
 
   const remove = async (id) => {
     if (!confirm("Delete this service?")) return;
-    await base44.entities.Service.delete(id);
+    await backend.entities.Service.delete(id);
     load();
   };
 

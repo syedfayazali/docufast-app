@@ -5,7 +5,7 @@ import AdminLayout from "@/components/AdminLayout";
 import StatusBadge, { statusLabel } from "@/components/StatusBadge";
 import UpdateComposer from "@/components/UpdateComposer";
 import DocumentLink from "@/components/DocumentLink";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { addressLines, formRows, inr, when, methodLabel } from "@/lib/orders";
 
 const STATUSES = ["Submitted", "Under Review", "Action Required", "Approved", "Completed", "Rejected", "Cancelled"];
@@ -33,20 +33,20 @@ export default function AdminOrderDetail() {
   const [showNotes, setShowNotes] = useState(false);
 
   const load = async () => {
-    const a = await base44.entities.Application.get(id);
+    const a = await backend.entities.Application.get(id);
     setApp(a);
-    if (!a.admin_seen_at) base44.entities.Application.update(id, { admin_seen_at: new Date().toISOString() }).catch(() => {});
+    if (!a.admin_seen_at) backend.entities.Application.update(id, { admin_seen_at: new Date().toISOString() }).catch(() => {});
     const [p, u, ap] = await Promise.all([
-      base44.entities.Payment.filter({ application_id: id }),
-      base44.entities.ApplicationUpdate.filter({ application_id: id }, "-created_date", 100),
-      base44.entities.Appointment.filter({ application_id: id }, "-slot_start", 10).catch(() => []),
+      backend.entities.Payment.filter({ application_id: id }),
+      backend.entities.ApplicationUpdate.filter({ application_id: id }, "-created_date", 100),
+      backend.entities.Appointment.filter({ application_id: id }, "-slot_start", 10).catch(() => []),
     ]);
     setPay(p[0] || null); setUpdates(u); setAppts(ap);
   };
   useEffect(() => { load().catch(() => setErr("Order not found.")); /* eslint-disable-next-line */ }, [id]);
 
   const setStatus = async (status) => {
-    try { setApp(await base44.entities.Application.update(id, { status })); } catch (e) { setErr(e.message); }
+    try { setApp(await backend.entities.Application.update(id, { status })); } catch (e) { setErr(e.message); }
   };
 
   if (err) return <AdminLayout title="Order"><p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{err}</p></AdminLayout>;

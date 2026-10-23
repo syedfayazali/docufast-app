@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Eye, Loader2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 
 /** Opens a private uploaded file via a short-lived signed link. */
 export default function DocumentLink({ path, label = "View" }) {
@@ -12,7 +12,7 @@ export default function DocumentLink({ path, label = "View" }) {
     // Open the tab first (inside the click) so popup blockers allow it.
     const tab = window.open("", "_blank");
     try {
-      const { signed_url } = await base44.integrations.Core.CreateFileSignedUrl({ file_uri: path });
+      const { signed_url } = await backend.integrations.Core.CreateFileSignedUrl({ file_uri: path });
       if (tab) tab.location.href = signed_url;
       else window.location.href = signed_url;
     } catch {

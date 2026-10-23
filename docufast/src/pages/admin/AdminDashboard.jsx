@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import StatusBadge from "@/components/StatusBadge";
 import { FileText, Clock, AlertCircle, CheckCircle2, Calendar, CreditCard, Headphones } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import BannerEditor from "@/components/BannerEditor";
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -13,9 +13,9 @@ export default function AdminDashboard() {
   const [todayAppts, setTodayAppts] = useState(0);
 
   useEffect(() => {
-    base44.entities.Application.list("-created_date", 200).then((rows) => setApps(rows.filter((a) => a.status !== "Draft"))).catch(() => {});
-    base44.entities.Payment.list("-created_date", 200).then(setPayments).catch(() => {});
-    base44.entities.Appointment.filter({ status: "Booked" }, "slot_start", 300)
+    backend.entities.Application.list("-created_date", 200).then((rows) => setApps(rows.filter((a) => a.status !== "Draft"))).catch(() => {});
+    backend.entities.Payment.list("-created_date", 200).then(setPayments).catch(() => {});
+    backend.entities.Appointment.filter({ status: "Booked" }, "slot_start", 300)
       .then((r) => {
         const t = new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
         setTodayAppts(r.filter((a) => new Date(new Date(a.slot_start).getTime() + 5.5 * 3600 * 1000).toISOString().slice(0, 10) === t).length);

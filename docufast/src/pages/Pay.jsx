@@ -3,15 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Copy, Check, ArrowLeft, Phone, Globe, ShieldCheck, Lock, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
-import { Image } from "@/components/ui/image";
+import { QRCodeSVG } from "qrcode.react";
 import PaymentProofForm from "@/components/PaymentProofForm";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/AuthContext";
 
 const UPI_ID = "paytm.s2sk0dc@pty";
 const PAYEE_NAME = "Mr SYED FAYAZ ALI";
-const QR_IMAGE = "https://media.base44.com/images/public/6a99a28a5cee4eafc7da7547/4127f4aef_image.png";
 
 // Loads Razorpay Checkout once, on demand.
 function loadRazorpayScript() {
@@ -55,12 +54,12 @@ export default function Pay() {
     // Pay for the application in the link (?app=...), otherwise the most recent one.
     const wanted = new URLSearchParams(window.location.search).get("app");
     const query = wanted ? { created_by_id: user.id, id: wanted } : { created_by_id: user.id };
-    return base44.entities.Application.filter(query, "-created_date", 1)
+    return backend.entities.Application.filter(query, "-created_date", 1)
       .then((rows) => {
         const app = (Array.isArray(rows) ? rows[0] : rows?.items?.[0]) || null;
         setApplication(app);
         if (!app) return;
-        return base44.entities.Payment.filter({ application_id: app.id }, "-created_date", 1).then((p) => {
+        return backend.entities.Payment.filter({ application_id: app.id }, "-created_date", 1).then((p) => {
           const pay = (Array.isArray(p) ? p[0] : p?.items?.[0]) || null;
           setPayment(pay);
         });
@@ -153,6 +152,11 @@ export default function Pay() {
   };
 
   const amount = Number(application?.total) || 0;
+  // UPI payment link: scanning it opens the UPI app with payee, amount and reference already filled in.
+  const upiLink =
+    `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(PAYEE_NAME)}&cu=INR` +
+    (amount > 0 ? `&am=${amount.toFixed(2)}` : "") +
+    (application?.reference ? `&tn=${encodeURIComponent(application.reference)}` : "");
   const paid = payment?.status === "Paid";
   const proofAlreadySubmitted = !!payment?.utr;
 
@@ -160,7 +164,7 @@ export default function Pay() {
     if (!payment) return;
     setSubmitting(true);
     try {
-      await base44.entities.Payment.update(payment.id, {
+      await backend.entities.Payment.update(payment.id, {
         payment_proof_uri: fileUri,
         utr,
       });
@@ -326,17 +330,20 @@ export default function Pay() {
 
                 <div className="mt-4 flex justify-center">
                   <div className="rounded-xl border border-border bg-white p-2">
-                    <Image
-                      src={QR_IMAGE}
-                      alt="DocuFast India UPI payment QR code"
-                      fittingType="fit"
+                    <QRCodeSVG
+                      value={upiLink}
+                      size={256}
+                      level="M"
+                      marginSize={1}
+                      role="img"
+                      aria-label="DocuFast India UPI payment QR code"
                       className="h-64 w-64"
                     />
                   </div>
                 </div>
 
                 <p className="mt-3 text-center text-[11px] text-muted-foreground">
-                  Scan the QR with any UPI app and pay the amount shown above.
+                  Scan the QR with any UPI app. The amount is filled in for you.
                 </p>
               </div>
             </div>

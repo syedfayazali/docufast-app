@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Calendar, Clock, MapPin, Phone, Building2, Loader2, CheckCircle2, ChevronLeft } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 import { bookableDays, slotsForDay, countMap, dow, DAY_NAMES, fmtFull, fmtDay, slotInstant, notifyAppointment, downloadIcs } from "@/lib/appointments";
 import { cn } from "@/lib/utils";
@@ -40,19 +40,19 @@ export default function BookAppointment() {
     const list = bookableDays(s);
     const from = slotInstant(list[0], 0);
     const to = slotInstant(list[list.length - 1], 24 * 60 - 1);
-    setCounts(countMap(await base44.appointments.slotCounts(from, to)));
+    setCounts(countMap(await backend.appointments.slotCounts(from, to)));
   };
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       try {
-        const s = await base44.entities.AppointmentSettings.get("main");
+        const s = await backend.entities.AppointmentSettings.get("main");
         setSettings(s);
-        base44.entities.Service.list("display_order", 300).then((r) => setServices(r.filter((x) => x.active !== false))).catch(() => {});
+        backend.entities.Service.list("display_order", 300).then((r) => setServices(r.filter((x) => x.active !== false))).catch(() => {});
         const [mine, appts] = await Promise.all([
-          base44.entities.Application.filter({ created_by_id: user.id }, "-created_date", 30),
-          rescheduleId ? base44.entities.Appointment.filter({ id: rescheduleId }) : Promise.resolve([]),
+          backend.entities.Application.filter({ created_by_id: user.id }, "-created_date", 30),
+          rescheduleId ? backend.entities.Appointment.filter({ id: rescheduleId }) : Promise.resolve([]),
         ]);
         setApps(mine.filter((a) => a.status !== "Draft"));
         const last = mine[0];
@@ -98,9 +98,9 @@ export default function BookAppointment() {
     try {
       let row;
       if (existing) {
-        row = await base44.entities.Appointment.update(existing.id, { slot_start: slot.at.toISOString() });
+        row = await backend.entities.Appointment.update(existing.id, { slot_start: slot.at.toISOString() });
       } else {
-        row = await base44.entities.Appointment.create({
+        row = await backend.entities.Appointment.create({
           kind,
           customer_name: name.trim(),
           customer_mobile: mobile.trim(),

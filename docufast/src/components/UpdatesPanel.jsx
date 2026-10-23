@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Copy, Check, ExternalLink } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 
 const stamp = (d) => new Date(d).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" });
 
@@ -25,18 +25,18 @@ export function useApplicationUpdates(applicationId) {
     let alive = true;
     const load = async () => {
       try {
-        const rows = await base44.entities.ApplicationUpdate.filter({ application_id: applicationId }, "created_date", 50);
+        const rows = await backend.entities.ApplicationUpdate.filter({ application_id: applicationId }, "created_date", 50);
         if (!alive) return;
         setItems(rows);
         const unseen = rows.filter((r) => !r.seen_at);
         if (unseen.length) {
           setFresh((f) => new Set([...f, ...unseen.map((r) => r.id)]));
-          unseen.forEach((r) => base44.entities.ApplicationUpdate.update(r.id, { seen_at: new Date().toISOString() }).catch(() => {}));
+          unseen.forEach((r) => backend.entities.ApplicationUpdate.update(r.id, { seen_at: new Date().toISOString() }).catch(() => {}));
         }
       } catch { if (alive) setItems([]); }
     };
     load();
-    const off = base44.entities.ApplicationUpdate.subscribe((e) => { if (!e.data || e.data.application_id === applicationId) load(); });
+    const off = backend.entities.ApplicationUpdate.subscribe((e) => { if (!e.data || e.data.application_id === applicationId) load(); });
     return () => { alive = false; off && off(); };
   }, [applicationId]);
 

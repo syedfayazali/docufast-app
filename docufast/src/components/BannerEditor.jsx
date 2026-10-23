@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { Save, Megaphone, Upload } from "lucide-react";
 
 export default function BannerEditor() {
@@ -15,7 +15,7 @@ export default function BannerEditor() {
     setUploading(true);
     setMsg("");
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const { file_url } = await backend.integrations.Core.UploadFile({ file });
       setBanner({ ...form, image_url: file_url });
     } catch (err) {
       setMsg("Upload failed.");
@@ -25,7 +25,7 @@ export default function BannerEditor() {
   };
 
   useEffect(() => {
-    base44.entities.Banner.filter({ active: true }, "-display_order", 1)
+    backend.entities.Banner.filter({ active: true }, "-display_order", 1)
       .then((rows) => setBanner(rows[0] || blank()))
       .catch(() => setBanner(blank()))
       .finally(() => setLoading(false));
@@ -40,9 +40,9 @@ export default function BannerEditor() {
     try {
       if (!form.title?.trim()) { setMsg("Title is required."); return; }
       if (form.id) {
-        await base44.entities.Banner.update(form.id, form);
+        await backend.entities.Banner.update(form.id, form);
       } else {
-        const created = await base44.entities.Banner.create(form);
+        const created = await backend.entities.Banner.create(form);
         setBanner(created);
       }
       setMsg("Banner updated successfully.");

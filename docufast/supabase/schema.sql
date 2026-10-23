@@ -14,7 +14,7 @@ begin
   return new;
 end $$;
 
--- ---------- profiles (replaces Base44 "User") --------------------------
+-- ---------- profiles (one row per login) --------------------------
 create table if not exists public.profiles (
   id           uuid primary key references auth.users(id) on delete cascade,
   email        text,

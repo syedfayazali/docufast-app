@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Printer } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { backend } from "@/api/backend";
 import { businessInfo, isPlaceholder } from "@/lib/businessInfo";
 
 const fmt = (d) =>
@@ -17,8 +17,8 @@ export default function Receipt() {
 
   useEffect(() => {
     Promise.all([
-      base44.entities.Application.get(id),
-      base44.entities.Payment.filter({ application_id: id }, "-created_date", 1),
+      backend.entities.Application.get(id),
+      backend.entities.Payment.filter({ application_id: id }, "-created_date", 1),
     ])
       .then(([a, p]) => {
         setApp(a);
