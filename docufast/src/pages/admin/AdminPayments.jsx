@@ -4,6 +4,7 @@ import EmptyState from "@/components/EmptyState";
 import { Search, CreditCard, TrendingUp, ShieldCheck, X, Eye } from "lucide-react";
 import { backend } from "@/api/backend";
 import { Image } from "@/components/ui/image";
+import { pushNotify } from "@/lib/push";
 
 const fmtDate = (d) =>
   d
@@ -72,6 +73,7 @@ export default function AdminPayments() {
       if (appStatus && p.application_id) {
         await backend.entities.Application
           .update(p.application_id, { status: appStatus })
+          .then(() => pushNotify("status", p.application_id))
           .catch(() => {});
       }
       reload();

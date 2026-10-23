@@ -4,6 +4,7 @@
 // The browser can only ask; this function checks who is asking and what really happened.
 // Needs env: BREVO_API_KEY, MAIL_FROM  (optional: MAIL_REPLY_TO, MAIL_ADMIN_COPY, SUPPORT_PHONE)
 import { adminClient, requireUser, handler, readJson, send, HttpError } from './_lib/core.js';
+import { pushToUser, appointmentPush } from './_lib/push.js';
 
 const STATUS_FOR = { booked: 'Booked', rescheduled: 'Booked', cancelled: 'Cancelled', completed: 'Completed', no_show: 'No Show' };
 
@@ -78,6 +79,10 @@ export default handler(['POST'], async (req, res) => {
   // one e-mail per event per time slot
   const key = `${event}|${new Date(a.slot_start).toISOString()}`;
   if (a.last_mailed === key) return send(res, 200, { sent: false, reason: 'already-sent' });
+
+  // Phone notification first (independent of e-mail; same one-per-event rule via last_mailed).
+  const pushMsg = appointmentPush(a, event);
+  if (pushMsg) await pushToUser(admin, a.created_by_id, pushMsg);
 
   const apiKey = process.env.BREVO_API_KEY;
   const from = process.env.MAIL_FROM; // "DocuFast India <bookings@yourdomain.com>" or just the address

@@ -43,7 +43,7 @@ export default function Privacy() {
         <p>We do not sell your personal information. We share it only:</p>
         <List items={[
           "With the government department or authority that processes your application, to the extent needed for it.",
-          "With service providers who help us run the site, under their own security terms: Supabase (database, login and file storage), Vercel (website hosting), Cashfree (online payment processing), Brevo and our email delivery provider (sign-in, appointment and application update emails) and Google (if you choose Sign in with Google).",
+          "With service providers who help us run the site, under their own security terms: Supabase (database, login and file storage), Vercel (website hosting), Cashfree (online payment processing), Brevo and our email delivery provider (sign-in, appointment and application update emails), and the push-notification service built into your phone or browser (only if you turn on phone alerts; we store a notification address for your device, which you can remove any time by turning alerts off) and Google (if you choose Sign in with Google).",
           "Where required by law, court order or a lawful request from authorities.",
         ]} />
         <p>

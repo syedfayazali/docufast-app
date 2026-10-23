@@ -3,6 +3,7 @@
 import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { sendBrevo, shell, esc } from './mail.js';
+import { pushToUser, pushToAdmins } from './push.js';
 
 export function env(name) {
   const v = process.env[name];
@@ -198,6 +199,26 @@ export async function settleOrder({ admin, orderId, fetchImpl = fetch }) {
       .eq('id', pay.application_id)
       .in('status', ['Draft', 'Submitted']);
   }
+  // Phone notifications (best effort; never block the payment).
+  if (updated) {
+    try {
+      await pushToUser(admin, pay.created_by_id, {
+        title: 'Payment received',
+        body: `₹${pay.total} for ${pay.application_ref}. Your application is now under review.`,
+        url: `/applications/${pay.application_id}`,
+        tag: `pay-${pay.id}`,
+      });
+      await pushToAdmins(admin, {
+        title: 'New paid order',
+        body: `${pay.customer_name} · ${pay.service_name} · ₹${pay.total}`,
+        url: `/admin-orders/${pay.application_id}`,
+        tag: `order-${pay.id}`,
+      });
+    } catch (e) {
+      console.error('[push]', e);
+    }
+  }
+
   // Tell the owner a new paid order arrived (best effort; never blocks the payment).
   if (updated && process.env.MAIL_ADMIN_COPY) {
     try {

@@ -6,6 +6,7 @@ import EmptyState from "@/components/EmptyState";
 import { backend } from "@/api/backend";
 import { useAuth } from "@/lib/AuthContext";
 import { fmtFull } from "@/lib/appointments";
+import PushToggle from "@/components/PushToggle";
 
 const messageFor = (a) => {
   switch (a.status) {
@@ -81,6 +82,7 @@ export default function Notifications() {
     <div className="min-h-screen bg-secondary/40">
       <Header title="Notifications" />
       <main className="mx-auto max-w-5xl px-4 pb-24 pt-4">
+        <PushToggle className="mb-3" />
         <div className="space-y-2">
           {loading ? (
             <div className="rounded-2xl border border-border bg-white p-4 shadow-card text-sm text-muted-foreground">Loading…</div>

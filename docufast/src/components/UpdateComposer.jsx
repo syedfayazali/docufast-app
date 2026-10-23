@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Loader2, Trash2, Lock, Send } from "lucide-react";
 import { backend } from "@/api/backend";
 import { supabase } from "@/lib/supabase";
+import { pushNotify } from "@/lib/push";
 
 const field = "w-full rounded-xl border border-border bg-white px-3 py-2 text-sm outline-none focus:border-gold";
 const stamp = (d) => new Date(d).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" });
@@ -47,6 +48,7 @@ export default function UpdateComposer({ application }) {
         link: f.link.trim() || null,
         is_private: f.is_private,
       });
+      if (!f.is_private) pushNotify("update", row.id);
       let note = f.is_private ? "Private note saved (customer cannot see it)." : "Update posted – the customer can see it now.";
       if (!f.is_private && f.email) {
         const m = await mailUpdate(row.id);

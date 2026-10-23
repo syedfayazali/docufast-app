@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import MembershipCard from "@/components/MembershipCard";
 import AddressPicker from "@/components/AddressPicker";
+import PushToggle from "@/components/PushToggle";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -123,6 +124,8 @@ export default function Profile() {
         {photoError && (
           <p className="mt-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-medium text-red-700">{photoError}</p>
         )}
+
+        <PushToggle className="mt-4" />
 
         <div className="mt-4 rounded-2xl border border-border bg-white p-4 shadow-card">
           <h2 className="px-1 font-heading text-sm font-bold text-navy">Account Information</h2>

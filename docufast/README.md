@@ -265,3 +265,13 @@ Run `supabase/migration_008_updates_orders.sql` once in Supabase → SQL Editor.
 - **Customer address** now shows on every application in admin.
 - **Orders** (admin bottom bar): every paid application, newest first, with a **NEW** badge until you open it. Open one → **Print order** (customer, address, payment, application details, documents, notes). Tick *Include private notes* if you want them on the print.
 - Optional: set `MAIL_ADMIN_COPY` and `SITE_URL` in Vercel to get an email for each new paid order.
+
+## Phone notifications (web push, no Firebase)
+
+Customers get a pop-up on their phone when their application status changes, you post an update or reference number, a payment is confirmed, or an appointment is booked, rescheduled, cancelled or completed. You get a pop-up for every new paid order.
+
+1. Run `supabase/migration_009_push.sql` once in Supabase → SQL Editor.
+2. On your own computer run `npx web-push generate-vapid-keys`. It prints a public and a private key.
+3. In Vercel → Settings → Environment Variables add `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT` (for example `mailto:docufast.india@gmail.com`). Keep the private key secret. Then **Redeploy**.
+4. Customers turn alerts on from **Profile** or **Notifications** (the button asks the phone for permission). You do the same on your admin phone to receive new-order alerts.
+5. Android app: after `git pull`, rebuild the `.aab` (version 2) and upload it. The app already includes notification support. iPhone only receives alerts when the website is added to the Home Screen.

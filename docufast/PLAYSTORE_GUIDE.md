@@ -110,6 +110,7 @@ The project is in the `android/` folder. Follow **`android/BUILD-AAB.md`**: you 
 | Payment info (UPI reference, amount) | Yes | No | App functionality | Yes |
 | Messages (support form) | Yes | No | Support | Optional |
 | App activity (applications, appointments) | Yes | No | App functionality | Yes |
+| Device or other IDs (notification address for phone alerts) | Yes, only if the customer turns alerts on | No | App functionality (notifications) | **Optional** |
 
 \* We pass application data to the government authority that processes it, as the customer requests. Google calls sharing with a service provider acting on your behalf (Supabase, Vercel, Cashfree, Brevo) "not shared". If unsure, tick "Yes, shared with the government authority for application processing" for the personal-info rows. That is the more cautious answer.
 
