@@ -66,16 +66,6 @@ export async function disablePush() {
   await sub.unsubscribe().catch(() => {});
 }
 
-/** Sends a test alert to this account and reports what the server did. */
-export async function pushTest() {
-  const r = await fetch("/api/push-send", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${await token()}` },
-    body: JSON.stringify({ type: "test" }),
-  });
-  return r.json().catch(() => ({ error: "No answer from server" }));
-}
-
 /** Admin side: ask the server to notify the customer. Never blocks or breaks the app. */
 export async function pushNotify(type, id) {
   try {
