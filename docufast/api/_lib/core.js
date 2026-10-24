@@ -2,7 +2,7 @@
 // Files starting with "_" are NOT exposed as routes by Vercel.
 import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
-import { sendBrevo, shell, esc } from './mail.js';
+import { sendBrevo, shell, esc, siteBase } from './mail.js';
 import { pushToUser, pushToAdmins } from './push.js';
 
 export function env(name) {
@@ -230,8 +230,8 @@ export async function settleOrder({ admin, orderId, fetchImpl = fetch }) {
           heading: 'New paid order',
           intro: `${pay.customer_name} paid ₹${pay.total} for ${pay.service_name}.`,
           bodyHtml: `<p style="font-size:14px">Reference <b>${esc(pay.application_ref)}</b></p>`,
-          buttonUrl: `${(process.env.SITE_URL || '').replace(/\/$/, '')}/admin-orders`,
-          buttonLabel: 'Open Orders',
+          buttonUrl: `${siteBase()}/admin-orders${pay.application_id ? `/${pay.application_id}` : ''}`,
+          buttonLabel: 'Open order',
         }),
       });
     } catch (e) {

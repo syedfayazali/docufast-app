@@ -39,6 +39,13 @@ export async function sendBrevo({ to, subject, html, bcc }) {
   }
 }
 
+/** Public site address for links in emails when there is no request (e.g. payment webhooks). Always absolute https. */
+export function siteBase() {
+  let u = String(process.env.SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || 'docufast-app.vercel.app').trim().replace(/\/+$/, '');
+  if (!/^https?:\/\//i.test(u)) u = `https://${u}`;
+  return u;
+}
+
 export const siteUrlFrom = (req) => (process.env.SITE_URL || `https://${req?.headers?.host || ''}`).replace(/\/$/, '');
 
 export function shell({ heading, tone = '#0A1D4D', intro, bodyHtml, buttonUrl, buttonLabel, phone }) {
