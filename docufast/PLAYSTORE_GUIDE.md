@@ -13,7 +13,7 @@ Your app is a website, so it goes to Play as a **Trusted Web Activity (TWA)**: a
 | Service worker + offline page | Done (`public/sw.js`) |
 | Public **Delete account** page (Google asks for this URL) | Done: `/delete-account`, also linked in the footer |
 | In-app account deletion request | Already in Profile |
-| Privacy Policy mentions location, appointments, Cashfree, Brevo | Done |
+| Privacy Policy mentions location, appointments, Razorpay, Brevo | Done |
 | Terms, Refund, Contact pages, "not a government website" disclaimer | Already there |
 | Digital Asset Links file for the verified (no address bar) app | Template: `public/.well-known/assetlinks.json` – **you fill 2 fingerprints** (step 5) |
 | Store graphics: 512 icon + 1024×500 feature graphic | `store-assets/` |
@@ -33,7 +33,7 @@ Your app is a website, so it goes to Play as a **Trusted Web Activity (TWA)**: a
 | **User data / privacy policy** | Policy URL required, must match what the app does | `https://YOUR-SITE/privacy` (updated) |
 | **Account deletion** | Needs in-app path **and** a web URL | In-app: Profile → Request Account Deletion. Web: `https://YOUR-SITE/delete-account` |
 | **Permissions** | Location is requested only when the customer taps "Use my location" | Declare in Data safety (below). A TWA uses the browser's permission prompt. |
-| **Payments** | Selling real-world services through Cashfree is allowed, Google Play Billing is only for digital goods | Nothing to change. Do not sell digital items (coins, premium features) outside Play Billing. |
+| **Payments** | Selling real-world services through Razorpay is allowed, Google Play Billing is only for digital goods | Nothing to change. Do not sell digital items (coins, premium features) outside Play Billing. |
 | **Minimum functionality / broken links** | Site must load fast and not crash | Test on a real phone first; see checklist in section 7. |
 | **Sensitive data** | ID documents are uploaded | Mention in Data safety; encrypted in transit and at rest (Supabase) |
 
@@ -94,7 +94,7 @@ The project is in the `android/` folder. Follow **`android/BUILD-AAB.md`**: you 
 
 **News app:** No. **COVID tracing:** No. **Government app declaration:** answer **No – this app is not developed by or on behalf of a government**. If the form asks how it relates to government services, say: "Private assistance service; not affiliated with any government."
 
-**Financial features:** If asked: "Payments are made for our own service fees via a licensed payment gateway (Cashfree); we are not a bank, lender or investment app."
+**Financial features:** If asked: "Payments are made for our own service fees via a licensed payment gateway (Razorpay); we are not a bank, lender or investment app."
 
 **Data safety** – "Does your app collect or share user data?" Yes. Encrypted in transit: **Yes**. Users can request deletion: **Yes**, URL `https://YOUR-SITE/delete-account`.
 
@@ -112,7 +112,7 @@ The project is in the `android/` folder. Follow **`android/BUILD-AAB.md`**: you 
 | App activity (applications, appointments) | Yes | No | App functionality | Yes |
 | Device or other IDs (notification address for phone alerts) | Yes, only if the customer turns alerts on | No | App functionality (notifications) | **Optional** |
 
-\* We pass application data to the government authority that processes it, as the customer requests. Google calls sharing with a service provider acting on your behalf (Supabase, Vercel, Cashfree, Brevo) "not shared". If unsure, tick "Yes, shared with the government authority for application processing" for the personal-info rows. That is the more cautious answer.
+\* We pass application data to the government authority that processes it, as the customer requests. Google calls sharing with a service provider acting on your behalf (Supabase, Vercel, Razorpay, Brevo) "not shared". If unsure, tick "Yes, shared with the government authority for application processing" for the personal-info rows. That is the more cautious answer.
 
 **Privacy policy URL:** `https://YOUR-SITE/privacy`
 

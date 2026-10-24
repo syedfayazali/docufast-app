@@ -81,7 +81,7 @@ export default function Receipt() {
           <Line k="Date paid" v={fmt(pay.paid_at || pay.updated_date)} />
           <Line k="Customer" v={app.customer_name} />
           <Line k="Service" v={app.service_name} />
-          <Line k="Payment method" v={pay.payment_method === "upi_manual" ? "UPI (manual)" : pay.payment_method === "cashfree" ? "Online (Cashfree)" : "Online (Razorpay)"} />
+          <Line k="Payment method" v={pay.payment_method === "upi_manual" ? "UPI (manual)" : "Online (Razorpay)"} />
           {pay.razorpay_payment_id && <Line k="Gateway payment ID" v={pay.razorpay_payment_id} />}
           {pay.utr && <Line k="UTR" v={pay.utr} />}
         </dl>

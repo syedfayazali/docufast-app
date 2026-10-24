@@ -5,7 +5,7 @@ How the app is put together:
 | Part | Service |
 |---|---|
 | Database, login, file storage | **Supabase** (free tier is enough to start) |
-| Online payments | **Cashfree** (UPI, cards, net banking) + a manual UPI QR fallback |
+| Online payments | **Razorpay** (UPI, cards, net banking) + a manual UPI QR fallback |
 | Hosting | **Vercel**, deployed from **GitHub** |
 
 The pages call `src/api/backend.js`, a small adapter on top of Supabase
@@ -26,7 +26,7 @@ android/        Android Studio project that wraps the site for Google Play
 
 - Node.js 18+ (https://nodejs.org), Git, a GitHub account
 - A Supabase account (https://supabase.com)
-- A Cashfree account (https://www.cashfree.com) — Test mode works immediately; Live needs KYC
+- A Razorpay account (https://razorpay.com) — Test mode works immediately; Live needs KYC
 - A Vercel account (https://vercel.com) — sign in with GitHub
 
 ---
@@ -78,7 +78,7 @@ If you skip this, remove the Google buttons from `Login.jsx` and `Register.jsx`.
 ```bash
 cd docufast
 npm install
-cp .env.example .env        # then fill in the values from step 1 (and step 3 for Cashfree)
+cp .env.example .env        # then fill in the values from step 1 (and step 3 for Razorpay)
 npm run dev                 # opens http://localhost:5173  (login, services, applications, uploads)
 ```
 
@@ -95,25 +95,27 @@ vercel dev                        # http://localhost:3000 — site + /api togeth
 
 ---
 
-## 3. Cashfree (payment gateway)  (~10 min)
+## 3. Razorpay (payment gateway)  (~10 min)
 
-1. Create an account at https://www.cashfree.com → Payment Gateway. Use **Test** mode first.
-2. Dashboard → **Developers → API Keys** → copy:
-   - App ID → `CASHFREE_APP_ID`
-   - Secret Key → `CASHFREE_SECRET_KEY` ⚠️ secret.
-3. Set `CASHFREE_ENV=sandbox` while using Test keys, and `CASHFREE_ENV=production` with Live keys. **Keys and mode must match**, otherwise the Pay button shows "Payment gateway rejected our keys".
-4. Dashboard → **Developers → Webhooks** → add:
-   - URL: `https://YOUR-SITE.vercel.app/api/cashfree-webhook`
-   - Event: **Payment Success** (webhook version 2023-08-01 or newer). The signature uses your Secret Key, so there is no separate webhook secret.
-5. Optional: `SITE_URL=https://your-site.vercel.app` (used for the post-payment return link).
+1. Create an account at https://razorpay.com. Use **Test mode** first.
+2. Dashboard → **Account & Settings → API Keys → Generate Key**. Copy:
+   - Key Id (`rzp_test_…`) → `RAZORPAY_KEY_ID`
+   - Key Secret → `RAZORPAY_KEY_SECRET` ⚠️ secret, shown only once. Never put it in GitHub or share it.
+3. `rzp_test_` keys run test mode and `rzp_live_` keys run live mode. Both keys must come from the same mode.
+4. Dashboard → **Account & Settings → Webhooks → Add**:
+   - URL: `https://YOUR-SITE.vercel.app/api/razorpay-webhook`
+   - Events: **payment.captured** and **order.paid**
+   - Set a secret and put the same value in Vercel as `RAZORPAY_WEBHOOK_SECRET`.
 
 **How it works:**
 1. Customer submits an application; the database creates a *Pending* payment with the price copied from the service.
-2. On the Pay page they tap **Pay ₹X securely** → `/api/create-order` creates a Cashfree order for the amount stored in the database.
-3. Cashfree Checkout opens → customer pays → `/api/verify-payment` asks Cashfree directly that this exact order is **PAID** for the right amount → payment becomes **Paid**, application moves to **Under Review**.
-4. `/api/cashfree-webhook` does the same if the customer closes the browser right after paying.
+2. On the Pay page they tap **Pay ₹X securely** → `/api/create-order` creates a Razorpay order for the amount stored in the database.
+3. Razorpay Checkout opens → customer pays → `/api/verify-payment` checks the signature and asks Razorpay directly that this exact order is paid for the right amount → payment becomes **Paid**, application moves to **Under Review**.
+4. `/api/razorpay-webhook` does the same if the customer closes the browser right after paying.
 
-**Going live:** complete Cashfree KYC/activation, put the **Live** App ID and Secret Key in Vercel, set `CASHFREE_ENV=production`, add the webhook again in the Live dashboard, redeploy. Cashfree reviews your website and business category before activation, so describe your service honestly (a private assistance service charging a service fee, not a government office) and keep Terms, Privacy, Refund and Contact pages live.
+**Test payment:** in test mode use UPI ID `success@razorpay`, or Razorpay's test card numbers from their docs.
+
+**Going live:** complete Razorpay KYC/activation, generate **Live** keys, put them in Vercel, add the webhook again in Live mode, redeploy. Describe your service honestly (a private assistance service charging a service fee, not a government office) and keep Terms, Privacy, Refund and Contact pages live.
 
 ## 4. Become the admin & load your data
 
@@ -137,7 +139,7 @@ vercel dev                        # http://localhost:3000 — site + /api togeth
 cd docufast
 git init
 git add .
-git commit -m "DocuFast India: Supabase + Cashfree"
+git commit -m "DocuFast India: Supabase + Razorpay"
 git branch -M main
 # create an EMPTY private repo on github.com first (no README), then:
 git remote add origin https://github.com/YOUR-USER/docufast.git
@@ -157,13 +159,13 @@ git push -u origin main
    | `VITE_SUPABASE_ANON_KEY` | Supabase anon key |
    | `SUPABASE_URL` | same project URL |
    | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service_role key |
-   | `CASHFREE_APP_ID` | your Cashfree App ID |
-   | `CASHFREE_SECRET_KEY` | Cashfree secret key |
-   | `CASHFREE_ENV` | `sandbox` (test keys) or `production` (live keys) |
+   | `RAZORPAY_KEY_ID` | your Razorpay Key Id |
+   | `RAZORPAY_KEY_SECRET` | your Razorpay Key Secret |
+   | `RAZORPAY_WEBHOOK_SECRET` | webhook secret (optional but recommended) |
 
 4. **Deploy.** You get `https://something.vercel.app`.
-5. Go back and finish: Supabase **URL Configuration** (step 1a-4) and the Cashfree **webhook** (step 3-4) with the real URL.
-6. Custom domain: Vercel → Project → **Settings → Domains**, then update the Supabase Site URL/redirects and the Cashfree webhook to the new domain.
+5. Go back and finish: Supabase **URL Configuration** (step 1a-4) and the Razorpay **webhook** (step 3-4) with the real URL.
+6. Custom domain: Vercel → Project → **Settings → Domains**, then update the Supabase Site URL/redirects and the Razorpay webhook to the new domain.
 
 From now on every `git push` to `main` redeploys automatically. Changing an env var needs **Redeploy** for it to take effect.
 
@@ -178,7 +180,7 @@ From now on every `git push` to `main` redeploys automatically. Changing an env 
 - [ ] **Pay ₹X securely** → test UPI/card succeeds → page shows *Payment Verified*; application is *Under Review*
 - [ ] Admin → Applications: you can see the uploaded documents (View) and change status; the customer sees the live status update
 - [ ] Admin → Payments shows the payment as **Paid**; manual-UPI proof flow still works
-- [ ] In Cashfree → Developers → Webhooks → recent deliveries show `200`
+- [ ] In Razorpay → Developers → Webhooks → recent deliveries show `200`
 - [ ] As a normal (non-admin) user, opening `/admin-dashboard` redirects you away (and the database would refuse the data anyway)
 
 ---
@@ -187,7 +189,7 @@ From now on every `git push` to `main` redeploys automatically. Changing an env 
 
 - The browser only ever holds the Supabase **anon** key. All access is limited by Row Level Security: customers see only their own applications, payments and files; only admins write services/banners or change application status.
 - Prices are copied from the `services` table by a database trigger on insert; payment status, amounts and gateway IDs can only be changed by an admin or by the server (service-role key). A customer can only attach a UTR/screenshot to their own pending payment.
-- Never share or commit `SUPABASE_SERVICE_ROLE_KEY` or `CASHFREE_SECRET_KEY`. If one leaks, rotate it in its dashboard and update Vercel.
+- Never share or commit `SUPABASE_SERVICE_ROLE_KEY` or `RAZORPAY_KEY_SECRET`. If one leaks, rotate it in its dashboard and update Vercel.
 
 ## Troubleshooting
 
@@ -198,8 +200,8 @@ From now on every `git push` to `main` redeploys automatically. Changing an env 
 | "Email rate limit exceeded" | set up custom SMTP (step 1a-5) |
 | Google: `redirect_uri_mismatch` | the Google redirect URI must be exactly `https://<ref>.supabase.co/auth/v1/callback` |
 | Refreshing a page gives 404 on Vercel | `vercel.json` must be in the repo root (it is) |
-| Pay button: "Server is missing environment variable …" | add the Cashfree/Supabase server vars in Vercel and Redeploy |
-| Pay works but status stays Pending | webhook not set or wrong secret — Cashfree → Developers → Webhooks → logs |
+| Pay button: "Server is missing environment variable …" | add the Razorpay/Supabase server vars in Vercel and Redeploy |
+| Pay works but status stays Pending | webhook not set or wrong secret — Razorpay → Developers → Webhooks → logs |
 | Admin pages bounce to the customer dashboard | you haven't run the `update public.profiles … 'admin'` SQL yet, or need to log out/in after it |
 | `Unknown or inactive service` on submit | the service isn't in the `services` table (or `active = false`) |
 
@@ -224,7 +226,7 @@ In Supabase → SQL Editor run `supabase/migration_003_addresses.sql`. Customers
 
 1. Customer fills **Details** (saved applicant + saved address) → **Documents** → **Review & Pay**.
 2. Saving creates the application as **Draft** (shown to the customer as *Awaiting Payment*) with a pending payment. Admin lists hide drafts.
-3. The customer is sent straight to the Pay page. When Cashfree confirms the payment (browser return check or webhook) the server moves the application to **Under Review**.
+3. The customer is sent straight to the Pay page. When Razorpay confirms the payment (browser return check or webhook) the server moves the application to **Under Review**.
 4. Unpaid drafts appear in *My Applications* with a **Complete payment** button. Starting the same service again removes the older untouched draft.
 5. After payment: confirmation screen, **printable receipt** (`/receipt/<application id>`), and a timeline (created → payment → review → approved → completed).
 6. Manual UPI (fallback): the customer submits UTR + screenshot; the admin verifies it under *Payments*, which moves the application to **Under Review**.

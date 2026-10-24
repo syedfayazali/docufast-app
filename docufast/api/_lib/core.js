@@ -1,4 +1,4 @@
-// Shared server-side helpers for the Cashfree payment endpoints.
+// Shared server-side helpers for the Razorpay payment endpoints.
 // Files starting with "_" are NOT exposed as routes by Vercel.
 import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
@@ -36,35 +36,33 @@ export async function requireUser(req, admin) {
 }
 
 // ---------------------------------------------------------------------------
-// Cashfree Payment Gateway (API version 2023-08-01)
-// Test keys -> CASHFREE_ENV=sandbox   |   Live keys -> CASHFREE_ENV=production
+// Razorpay Payment Gateway (Orders API)
+// rzp_test_* keys = test mode, rzp_live_* keys = live mode. No extra env switch needed.
 // ---------------------------------------------------------------------------
-export function cashfreeMode() {
-  return String(process.env.CASHFREE_ENV || 'sandbox').toLowerCase() === 'production' ? 'production' : 'sandbox';
+export function razorpayMode() {
+  return String(process.env.RAZORPAY_KEY_ID || '').startsWith('rzp_live_') ? 'live' : 'test';
 }
 
-export async function cashfree(path, init = {}, fetchImpl = fetch) {
-  const base = cashfreeMode() === 'production' ? 'https://api.cashfree.com/pg' : 'https://sandbox.cashfree.com/pg';
-  const res = await fetchImpl(`${base}${path}`, {
+export async function razorpay(path, init = {}, fetchImpl = fetch) {
+  const auth = Buffer.from(`${env('RAZORPAY_KEY_ID')}:${env('RAZORPAY_KEY_SECRET')}`).toString('base64');
+  const res = await fetchImpl(`https://api.razorpay.com/v1${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      'x-api-version': '2023-08-01',
-      'x-client-id': env('CASHFREE_APP_ID'),
-      'x-client-secret': env('CASHFREE_SECRET_KEY'),
+      Authorization: `Basic ${auth}`,
       ...(init.headers || {}),
     },
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    console.error('[cashfree]', res.status, JSON.stringify(body));
-    if (res.status === 401 || res.status === 403) {
+    console.error('[razorpay]', res.status, JSON.stringify(body));
+    if (res.status === 401) {
       throw new HttpError(
         502,
-        `Payment gateway rejected our keys (mode: ${cashfreeMode()}). Check CASHFREE_APP_ID, CASHFREE_SECRET_KEY and CASHFREE_ENV match (test keys need sandbox, live keys need production).`
+        `Payment gateway rejected our keys (mode: ${razorpayMode()}). Check RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are a matching pair.`
       );
     }
-    throw new HttpError(502, body?.message || 'Payment gateway error');
+    throw new HttpError(502, body?.error?.description || 'Payment gateway error');
   }
   return body;
 }
@@ -75,22 +73,23 @@ const safeEqual = (a, b) => {
   return x.length === y.length && crypto.timingSafeEqual(x, y);
 };
 
-/** Cashfree webhook signature: base64( HMAC_SHA256(timestamp + rawBody, secret_key) ) */
-export function verifyWebhookSignature({ rawBody, signature, timestamp, secret }) {
-  if (!signature || !timestamp) return false;
-  const expected = crypto.createHmac('sha256', secret).update(`${timestamp}${rawBody}`).digest('base64');
+/** Webhook signature: hex( HMAC_SHA256(rawBody, webhook_secret) ) from header x-razorpay-signature */
+export function verifyWebhookSignature({ rawBody, signature, secret }) {
+  if (!signature) return false;
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
   return safeEqual(expected, signature);
 }
 
-/** Our Cashfree order ids embed the payments-row id:  df_<32 hex>_<time>  */
-export function makeOrderId(paymentRowId) {
-  return `df_${String(paymentRowId).replace(/-/g, '')}_${Date.now().toString(36)}`.slice(0, 50);
+/** Checkout callback signature: hex( HMAC_SHA256(order_id + "|" + payment_id, key_secret) ) */
+export function verifyCheckoutSignature({ orderId, paymentId, signature, secret }) {
+  if (!orderId || !paymentId || !signature) return false;
+  const expected = crypto.createHmac('sha256', secret).update(`${orderId}|${paymentId}`).digest('hex');
+  return safeEqual(expected, signature);
 }
-export function paymentRowIdFromOrderId(orderId) {
-  const m = /^df_([0-9a-f]{32})_/.exec(String(orderId || ''));
-  if (!m) return null;
-  const h = m[1];
-  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+
+/** Razorpay receipts are max 40 chars. We store the payments-row id in order notes (see create-order). */
+export function makeReceipt(paymentRowId) {
+  return `df_${String(paymentRowId).replace(/-/g, '')}`.slice(0, 40);
 }
 
 export async function readRawBody(req) {
@@ -139,39 +138,41 @@ export function handler(methods, fn) {
 }
 
 /**
- * Mark a payment as Paid after Cashfree confirms it.
+ * Mark a payment as Paid after Razorpay confirms it.
  *
- * The source of truth is Cashfree itself: we fetch the order with our secret key and
- * check (a) it is PAID, (b) it belongs to THIS payments row, (c) the amount equals
- * what we charge. Nothing the browser sends is trusted. Idempotent: the browser
+ * The source of truth is Razorpay itself: we fetch the order with our secret key and
+ * check (a) it is paid, (b) it belongs to a payments row (via notes), (c) the amount
+ * equals what we charge. Nothing the browser sends is trusted. Idempotent: the browser
  * callback and the webhook may both call it.
- * (The DB columns are still named razorpay_*; they simply hold the Cashfree ids.)
  */
-export async function settleOrder({ admin, orderId, fetchImpl = fetch }) {
-  const rowId = paymentRowIdFromOrderId(orderId);
+export async function getOrderRow({ admin, orderId, fetchImpl = fetch }) {
+  if (!/^order_[A-Za-z0-9]+$/.test(String(orderId || ''))) throw new HttpError(400, 'Invalid order id');
+  const order = await razorpay(`/orders/${encodeURIComponent(orderId)}`, {}, fetchImpl);
+  const rowId = order?.notes?.payment_row_id;
   if (!rowId) throw new HttpError(400, 'Order is not linked to a payment');
-
-  const order = await cashfree(`/orders/${encodeURIComponent(orderId)}`, {}, fetchImpl);
-
   const { data: pay, error } = await admin.from('payments').select('*').eq('id', rowId).maybeSingle();
   if (error) throw new HttpError(500, error.message);
   if (!pay) throw new HttpError(404, 'Payment record not found');
+  return { order, pay };
+}
+
+export async function settleOrder({ admin, orderId, fetchImpl = fetch }) {
+  const { order, pay } = await getOrderRow({ admin, orderId, fetchImpl });
 
   if (pay.status === 'Paid') return { alreadyPaid: true, payment: pay };
   if (pay.status === 'Refunded') throw new HttpError(409, 'Payment was refunded');
 
   const expected = Math.round(Number(pay.total) * 100);
-  const got = Math.round(Number(order.order_amount) * 100);
-  if (order.order_status !== 'PAID' || got !== expected || order.order_currency !== 'INR') {
+  if (order.status !== 'paid' || Number(order.amount_paid) !== expected || order.currency !== 'INR') {
     throw new HttpError(400, 'Payment not completed or amount mismatch');
   }
 
-  // Find the successful attempt (for the record only).
-  let cfPaymentId = null;
+  // Find the captured attempt (for the record only).
+  let rzpPaymentId = null;
   try {
-    const list = await cashfree(`/orders/${encodeURIComponent(orderId)}/payments`, {}, fetchImpl);
-    const ok = (Array.isArray(list) ? list : []).find((p) => p.payment_status === 'SUCCESS');
-    cfPaymentId = ok?.cf_payment_id != null ? String(ok.cf_payment_id) : null;
+    const list = await razorpay(`/orders/${encodeURIComponent(orderId)}/payments`, {}, fetchImpl);
+    const ok = (list?.items || []).find((p) => p.status === 'captured');
+    rzpPaymentId = ok?.id || null;
   } catch {
     /* not critical */
   }
@@ -180,9 +181,9 @@ export async function settleOrder({ admin, orderId, fetchImpl = fetch }) {
     .from('payments')
     .update({
       status: 'Paid',
-      payment_method: 'cashfree',
+      payment_method: 'razorpay',
       razorpay_order_id: orderId,
-      razorpay_payment_id: cfPaymentId,
+      razorpay_payment_id: rzpPaymentId,
       paid_at: new Date().toISOString(),
     })
     .eq('id', pay.id)

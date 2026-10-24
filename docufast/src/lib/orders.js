@@ -20,4 +20,4 @@ export function formRows(app) {
 
 export const inr = (n) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
 export const when = (d) => (d ? new Date(d).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }) : "—");
-export const methodLabel = (p) => (p?.payment_method === "cashfree" ? "Online (Cashfree)" : p?.payment_method === "upi_manual" ? "Manual UPI" : p?.payment_method || "—");
+export const methodLabel = (p) => (p?.payment_method === "razorpay" || p?.payment_method === "cashfree" ? "Online (Razorpay)" : p?.payment_method === "upi_manual" ? "Manual UPI" : p?.payment_method || "—");
