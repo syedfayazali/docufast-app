@@ -4,7 +4,7 @@ import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
 
 const values = [
-  { icon: ShieldCheck, title: "No Hidden Charges", text: "Government fees and our service charges are always shown separately." },
+  { icon: ShieldCheck, title: "No Hidden Charges", text: "You pay only our service charge. Any official fee is shown separately and paid by you to the department." },
   { icon: Eye, title: "Transparent Process", text: "You see exactly what you're paying for and what each step involves." },
   { icon: Activity, title: "Application Tracking", text: "Track your application status from submission to completion." },
   { icon: Headphones, title: "Customer Support", text: "Our team is here to guide you through every step." },
@@ -18,8 +18,9 @@ export default function About() {
           <Logo variant="light" />
           <h1 className="mt-6 font-heading text-2xl font-bold">About DocuFast India</h1>
           <p className="mt-2 max-w-2xl text-sm text-white/75">
-            DocuFast India is an independent facilitation platform that helps customers access and manage
-            government and document-related services through a simple, transparent and professional interface.
+            DocuFast India is a private document-help service in Mahabubnagar, Telangana. We help customers prepare
+            their documents and applications correctly and keep track of them. We are not connected with any government body,
+            and every service page links to the official website.
           </p>
         </div>
       </div>
@@ -43,8 +44,8 @@ export default function About() {
           </div>
           <p className="mt-2 text-sm text-amber-800/90">
             DocuFast India is not a government department. We do not guarantee government approval or processing times.
-            Government fees are subject to applicable government rules and may change. Our role is to guide and assist
-            you through the application process transparently.
+            Official fees are set by the department, are paid by you directly to it and may change. Our role is to guide and assist
+            you, and we charge only our own service fee.
           </p>
         </div>
       </main>

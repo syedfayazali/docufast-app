@@ -12,8 +12,8 @@ export default function Terms() {
       <Section title="1. Who we are">
         <p>
           {b.brandName} is operated by {b.legalName} ("we", "us"). We are an independent, privately run
-          assistance service that helps customers prepare, submit and track applications for government and
-          document-related services.
+          document-help service. We help customers prepare their documents and applications and book appointments, and we
+          keep them updated. The relevant government website or office decides every application.
         </p>
         <p>
           <strong className="text-foreground">We are not a government department</strong> and are not
@@ -24,7 +24,7 @@ export default function Terms() {
 
       <Section title="2. What we do, and what we do not do">
         <List items={[
-          "We guide you through the application, check that your details and documents are complete, and submit or assist with submission to the concerned authority.",
+          "We guide you through the application, check that your details and documents are complete, and help you submit it on the official website or at the department. Each service page links to the official source.",
           "We show you the status of your application in your account.",
           "We do not issue any government document ourselves, and we do not control whether, or when, a government authority approves an application.",
           "We do not guarantee approval, specific results or processing times. Timelines shown are estimates set by the relevant authority and can change.",
@@ -41,9 +41,9 @@ export default function Terms() {
 
       <Section title="4. Fees and payment">
         <List items={[
-          "Before you pay, the service page and your application show the government fee, our service charge and any other charges separately, with the total.",
-          "The government fee is the amount prescribed by the concerned authority. It may change; if it changes after you applied we will tell you before proceeding.",
-          "Our service charge is the fee for our assistance. It is separate from the government fee.",
+          "Before you pay, the service page and your application show our service charge and any other charges, with the total you pay us.",
+          "Any official fee is set by the department. We do not collect it. You pay it directly on the official website or at the office, and it may change.",
+          "Our service charge is the fee for our own assistance (checking documents, help with the form, guidance and tracking). It is separate from any official fee.",
           "Prices include or exclude taxes as shown on the payment page. Applicable taxes, if any, are added as required by law.",
           "You can pay by UPI. For UPI payments made directly to us, we verify the transaction (UTR/reference and screenshot) before marking the payment as received. Verification usually takes a few hours during working hours.",
           "Your application moves to review only after your payment is verified.",

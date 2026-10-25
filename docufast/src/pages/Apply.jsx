@@ -124,7 +124,7 @@ export default function Apply() {
     const govt = service?.government_fee || 0;
     const charge = service?.service_charge || 0;
     const other = service?.other_charges || 0;
-    const total = govt + charge + other;
+    const total = charge + other; // only our fee is collected; the official fee is paid by the customer to the department
     const ref = `DFI-2026-${String(Math.floor(100000 + Math.random() * 899999))}`;
     const docNames = Object.entries(docs).filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`);
     try {
@@ -319,13 +319,15 @@ export default function Apply() {
               )}
               {service && (
                 <div className="mt-3 space-y-1.5 rounded-xl bg-secondary/60 p-3 text-sm">
-                  <Row label="Government Fee" value={`₹${service.government_fee || 0}`} />
-                  <Row label="DocuFast India Service Charge" value={`₹${service.service_charge || 0}`} />
+                  <Row label="DocuFast Service Charge" value={`₹${service.service_charge || 0}`} />
                   {(service.other_charges || 0) > 0 && <Row label="Other Charges" value={`₹${service.other_charges}`} />}
                   <div className="flex justify-between border-t border-border pt-1.5 font-semibold">
-                    <span>Total Payable</span>
-                    <span className="text-gold">₹{(service.government_fee || 0) + (service.service_charge || 0) + (service.other_charges || 0)}</span>
+                    <span>You pay DocuFast</span>
+                    <span className="text-gold">₹{(service.service_charge || 0) + (service.other_charges || 0)}</span>
                   </div>
+                  {(service.government_fee || 0) > 0 && (
+                    <p className="pt-1 text-[11px] text-amber-800">Official fee ₹{service.government_fee} is not part of this payment. You pay it directly to the department.</p>
+                  )}
                 </div>
               )}
               <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-xl bg-secondary/60 p-3 text-left text-xs text-muted-foreground">
@@ -335,7 +337,7 @@ export default function Apply() {
                   <a href="/terms" target="_blank" rel="noreferrer" className="font-semibold text-navy underline">Terms</a>,{" "}
                   <a href="/privacy" target="_blank" rel="noreferrer" className="font-semibold text-navy underline">Privacy Policy</a> and{" "}
                   <a href="/refund-policy" target="_blank" rel="noreferrer" className="font-semibold text-navy underline">Refund Policy</a>, and I understand
-                  DocuFast India is an independent private service, not a government office, and cannot guarantee approval.
+                  DocuFast is an independent private service, not a government office, and cannot guarantee approval.
                 </span>
               </label>
               <p className="mt-2 text-[11px] text-muted-foreground">
@@ -361,7 +363,7 @@ export default function Apply() {
               </button>
             ) : (
               <button onClick={submit} disabled={submitting || !agreed} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gold py-3 text-sm font-bold text-navy disabled:opacity-60">
-                {submitting ? "Saving…" : `Pay ₹${(service?.government_fee || 0) + (service?.service_charge || 0) + (service?.other_charges || 0)} & Submit`}
+                {submitting ? "Saving…" : `Pay ₹${(service?.service_charge || 0) + (service?.other_charges || 0)} & Submit`}
               </button>
             )}
           </div>

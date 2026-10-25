@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "DocuFast India",
+  "name": "DocuFast",
   "short_name": "DocuFast",
-  "description": "Private assistance service for government and document applications. Not a government website.",
+  "description": "Private document-help service: prepare your documents and applications, book appointments and track progress. Not a government website.",
   "lang": "en-IN",
   "dir": "ltr",
   "start_url": "/home",

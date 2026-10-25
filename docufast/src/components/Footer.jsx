@@ -17,8 +17,8 @@ export default function Footer() {
         </nav>
         <p className="mx-auto mt-4 max-w-2xl text-[11px] leading-relaxed text-muted-foreground">
           {b.brandName} is an independent, privately operated assistance service. We are not a government
-          department and are not affiliated with, or endorsed by, any government authority. Government fees are
-          paid to the concerned authority; our service charge is separate and shown before you pay.
+          department and are not affiliated with, or endorsed by, any government authority. Any official fee is set by
+          the department and paid by you directly to it; we charge only our own service fee, shown before you pay.
         </p>
         <p className="mt-2 text-[11px] text-muted-foreground">
           {b.legalName} · {b.phone}

@@ -23,7 +23,7 @@ export default function Logo({ className, variant = "dark", showText = true, hei
             padding: 4,
           }}
         >
-          <img src={ICON_MARK} alt="DocuFast India" className="h-full w-full rounded-full object-contain" />
+          <img src={ICON_MARK} alt="DocuFast" className="h-full w-full rounded-full object-contain" />
         </span>
 
         {/* 2) the brand name, a sibling of the frame (NOT inside it) */}
@@ -32,7 +32,7 @@ export default function Logo({ className, variant = "dark", showText = true, hei
             className="ml-2.5 whitespace-nowrap font-heading font-bold leading-none tracking-tight"
             style={{ color: "#ffffff", fontSize: `${nameSize}px` }}
           >
-            DocuFast India
+            DocuFast
             <sup style={{ color: "#F5A623", fontSize: `${Math.round(nameSize * 0.6)}px`, marginLeft: "2px" }}>™</sup>
           </span>
         )}
@@ -47,11 +47,11 @@ export default function Logo({ className, variant = "dark", showText = true, hei
         className="flex shrink-0 items-center justify-center rounded-full border border-border shadow-sm"
         style={{ backgroundColor: "#ffffff", height, width: height, padding: 4 }}
       >
-        <img src={ICON_MARK} alt="DocuFast India" className="h-full w-full rounded-full object-contain" />
+        <img src={ICON_MARK} alt="DocuFast" className="h-full w-full rounded-full object-contain" />
       </span>
       {showName && (
         <span className="ml-2.5 whitespace-nowrap font-heading font-bold leading-none tracking-tight text-navy" style={{ fontSize: `${nameSize}px` }}>
-          DocuFast India
+          DocuFast
           <sup style={{ color: "#F5A623", fontSize: `${Math.round(nameSize * 0.6)}px`, marginLeft: "2px" }}>™</sup>
         </span>
       )}

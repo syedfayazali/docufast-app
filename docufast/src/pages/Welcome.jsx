@@ -13,8 +13,8 @@ const trust = [
 
 const preview = [
   { icon: FileText, label: "Certificates" },
-  { icon: Plane, label: "Passport" },
-  { icon: ScrollText, label: "Deeds" },
+  { icon: Plane, label: "Passport & ID" },
+  { icon: ScrollText, label: "Property Documents" },
 ];
 
 export default function Welcome() {
@@ -31,10 +31,10 @@ export default function Welcome() {
               <span className="h-1.5 w-1.5 rounded-full bg-gold" /> 100% Transparent Pricing
             </span>
             <h1 className="mt-4 font-heading text-3xl font-bold leading-tight sm:text-4xl">
-              Government Services<br />Made Simple &amp; Fast
+              Document Help<br />Made Simple &amp; Fast
             </h1>
             <p className="mt-4 text-sm leading-relaxed text-white/75 sm:text-base">
-              Apply for document and government services with transparent pricing, guided assistance and application tracking.
+              Get step-by-step help preparing your documents and applications, with clear pricing and status tracking. We are a private service, not a government office.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <button
@@ -66,7 +66,7 @@ export default function Welcome() {
 
         <div className="mt-10 rounded-3xl border border-border bg-secondary/40 p-6">
           <h2 className="font-heading text-lg font-bold text-navy">What we help you with</h2>
-          <p className="mt-1 text-sm text-muted-foreground">A guided, transparent way to apply for everyday government and document services.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Guided help to prepare your documents and applications correctly. Each service links to the official website.</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             {preview.map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-card">

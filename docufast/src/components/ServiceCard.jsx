@@ -17,7 +17,7 @@ const iconMap = {
 };
 
 export default function ServiceCard({ service }) {
-  const total = (service.government_fee || 0) + (service.service_charge || 0) + (service.other_charges || 0);
+  const total = (service.service_charge || 0) + (service.other_charges || 0);
   return (
     <Link
       to={`/service/${service.id}`}

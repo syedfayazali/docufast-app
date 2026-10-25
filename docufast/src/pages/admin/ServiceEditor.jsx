@@ -7,7 +7,7 @@ const empty = {
   name: "", category: "", short_description: "", description: "",
   government_fee: 0, service_charge: 0, other_charges: 0, processing_info: "",
   appointment_required: false, active: true, display_order: 0,
-  requirements: "", eligibility: "",
+  requirements: "", eligibility: "", official_url: "",
 };
 
 const defaultCategories = ["Certificates", "Passport", "Deeds", "Government Documents", "Other"];
@@ -80,9 +80,12 @@ export default function ServiceEditor() {
     e.preventDefault();
     setSaving(true); setMsg("");
     try {
+      const url = String(form.official_url || "").trim();
+      if (!/^https:\/\/[^\s/]+\.[^\s/]+/i.test(url)) throw new Error("Official source link must be a full website address starting with https://");
       const payload = {
         ...form,
         category: form.category || categoryOptions[0],
+        official_url: url,
         government_fee: Number(form.government_fee) || 0,
         service_charge: Number(form.service_charge) || 0,
         other_charges: Number(form.other_charges) || 0,
@@ -135,11 +138,13 @@ export default function ServiceEditor() {
             <Area label="Full Description" value={form.description} onChange={(v) => set("description", v)} rows={3} />
 
             <div className="grid grid-cols-3 gap-2">
-              <NumField label="Govt Fee (₹)" value={form.government_fee} onChange={(v) => set("government_fee", v)} />
+              <NumField label="Official fee, info only (₹)" value={form.government_fee} onChange={(v) => set("government_fee", v)} />
               <NumField label="Service Charge (₹)" value={form.service_charge} onChange={(v) => set("service_charge", v)} />
               <NumField label="Other (₹)" value={form.other_charges} onChange={(v) => set("other_charges", v)} />
             </div>
 
+            <p className="-mt-1 text-[11px] text-muted-foreground">Official fee is only shown to the customer. They pay it directly to the department. Customers pay you only the Service Charge + Other.</p>
+            <Field label="Official source link (required, e.g. https://www.passportindia.gov.in)" value={form.official_url} onChange={(v) => set("official_url", v)} required />
             <Area label="Document Requirements (one per line)" value={form.requirements} onChange={(v) => set("requirements", v)} rows={4} />
             <Field label="Eligibility / Who can apply" value={form.eligibility} onChange={(v) => set("eligibility", v)} />
             <Field label="Processing Info" value={form.processing_info} onChange={(v) => set("processing_info", v)} />

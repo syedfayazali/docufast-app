@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, Clock, ShieldCheck, FileText, UserCheck, ArrowRight } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock, ShieldCheck, FileText, UserCheck, ArrowRight, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import { backend } from "@/api/backend";
 
 const processSteps = [
-  "Submit application",
-  "Upload documents",
-  "DocuFast India verifies application",
-  "Application processed through the applicable authority",
-  "Track status",
-  "Receive/update documents when available",
+  "Tell us what you need and upload your documents",
+  "We check your documents and help you fill in the application correctly",
+  "We guide you to submit it on the official website or at the department, and you pay the official fee there yourself",
+  "We keep you updated with the details and reference numbers you share with us",
+  "The department decides. We do not issue documents or approve applications",
 ];
+
+const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return u; } };
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -58,7 +59,7 @@ export default function ServiceDetail() {
   const gov = service.government_fee || 0;
   const svc = service.service_charge || 0;
   const other = service.other_charges || 0;
-  const total = gov + svc + other;
+  const total = svc + other; // what DocuFast collects; the official fee is paid directly to the department
 
   return (
     <div className="min-h-screen bg-secondary/40">
@@ -76,6 +77,17 @@ export default function ServiceDetail() {
           <h1 className="mt-3 font-heading text-2xl font-bold">{service.name}</h1>
           <p className="mt-2 text-sm text-white/75">{service.short_description}</p>
         </div>
+
+        {/* Official source */}
+        {service.official_url && (
+          <a href={service.official_url} target="_blank" rel="noopener noreferrer" className="mt-4 flex items-start gap-3 rounded-2xl border border-border bg-white p-4 shadow-card">
+            <ExternalLink className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
+            <span>
+              <span className="block text-sm font-semibold text-navy">Official source: {hostOf(service.official_url)}</span>
+              <span className="block text-xs text-muted-foreground">This is the government website for this service. DocuFast is a private service and is not connected with it. You can always apply there directly.</span>
+            </span>
+          </a>
+        )}
 
         {/* Description */}
         <section className="mt-5 rounded-2xl border border-border bg-white p-5 shadow-card">
@@ -114,15 +126,28 @@ export default function ServiceDetail() {
             <ShieldCheck className="h-5 w-5 text-gold" />
             <h2 className="font-heading text-base font-bold text-navy">Fees</h2>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Government fees and DocuFast India service charges are shown separately.</p>
+          <p className="mt-1 text-xs text-muted-foreground">You pay DocuFast only for our help. The official fee is separate and goes straight to the department.</p>
           <div className="mt-3 divide-y divide-border">
-            <FeeRow label="Government Fee" value={gov} />
-            <FeeRow label="DocuFast India Service Charge" value={svc} />
+            <FeeRow label="DocuFast Service Charge" value={svc} />
             <FeeRow label="Other Charges" value={other} />
           </div>
           <div className="mt-3 flex items-center justify-between rounded-xl bg-navy px-4 py-3 text-white">
-            <span className="text-sm font-semibold">Total</span>
+            <span className="text-sm font-semibold">You pay DocuFast</span>
             <span className="font-heading text-lg font-bold text-gold">₹{total}</span>
+          </div>
+          {gov > 0 && (
+            <p className="mt-3 rounded-xl bg-amber-50 p-3 text-xs text-amber-900">
+              Official fee: <b>₹{gov}</b>. This is set by the department. It is <b>not</b> collected by DocuFast. You pay it directly on the official website or at the office, and it may change.
+            </p>
+          )}
+          <div className="mt-3 rounded-xl bg-secondary/60 p-3 text-xs text-muted-foreground">
+            <p className="font-semibold text-foreground">What our service charge covers</p>
+            <ul className="mt-1 list-disc space-y-0.5 pl-4">
+              <li>Checking that your documents are complete and correct</li>
+              <li>Help filling in the application and choosing the right options</li>
+              <li>Guidance on submitting it and booking an appointment if needed</li>
+              <li>Status tracking and updates in this app</li>
+            </ul>
           </div>
         </section>
 
@@ -146,7 +171,7 @@ export default function ServiceDetail() {
             <h2 className="font-heading text-base font-bold text-navy">Estimated Processing</h2>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            {service.processing_info || "Processing time depends on the concerned government authority."}
+            {service.processing_info || "Timing depends on the department. We cannot promise a date."}
           </p>
         </section>
 

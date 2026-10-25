@@ -16,8 +16,8 @@ export default function Refund() {
     >
       <Section title="1. What you pay for">
         <List items={[
-          "Government fee: the amount prescribed by the concerned authority, collected through us and passed on to it.",
           "Service charge: our fee for assisting with your application.",
+          "Official fees (if any) are set by the department and paid by you directly to it. We do not collect or refund them.",
           "Other charges, if any, are shown before you pay.",
         ]} />
       </Section>
@@ -26,7 +26,7 @@ export default function Refund() {
         <List items={[
           "You can ask to cancel at any time from the Contact page or by phone/email, quoting your application number.",
           "Before our team has started processing (status \"Submitted\"): cancellation is free and we refund the full amount you paid.",
-          "After processing has started (status \"Under Review\" or later): the service charge is not refundable because the work has begun. The government fee is refunded only if it has not yet been paid to the authority, or if the authority itself returns it to us (we then pass it on to you in full).",
+          "After processing has started (status \"Under Review\" or later): the service charge is not refundable because the work has begun.",
           "Once an application is \"Approved\" or \"Completed\", fees are not refundable.",
         ]} />
       </Section>
@@ -35,7 +35,7 @@ export default function Refund() {
         <List items={[
           "You paid twice for the same application, or an amount more than shown: we refund the extra amount.",
           "Your payment was received but we could not accept the application, for example the service is unavailable: full refund.",
-          "We made an error that caused the application to fail: we refund our service charge, and the government fee where it can be recovered.",
+          "We made an error that caused the application to fail: we refund our service charge.",
           "The authority rejects the application because of a mistake on our side.",
         ]} />
       </Section>

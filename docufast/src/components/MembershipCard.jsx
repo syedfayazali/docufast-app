@@ -97,7 +97,7 @@ const BENEFITS = ["Special Discounts", "Priority Support", "Exclusive Offers & U
 const CONTACTS = [
   { icon: Phone, text: "08542 355200" },
   { icon: MessageCircle, text: "83749 68022" },
-  { icon: Globe, text: "www.docufastindia.com" },
+  { icon: Globe, text: "docufast-app.vercel.app" },
   { icon: MapPin, text: "Mahabubnagar Branch, Telangana" },
 ];
 

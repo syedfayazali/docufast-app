@@ -100,7 +100,7 @@ export default function AdminOrderDetail() {
           <Row k="Gateway payment ID" v={pay?.razorpay_payment_id} />
           <Row k="UTR (manual UPI)" v={pay?.utr} />
           <div className="mt-1 border-t border-slate-200 pt-1">
-            <Row k="Government fee" v={inr(app.government_fee)} />
+            <Row k="Official fee (customer pays the department directly)" v={inr(app.government_fee)} />
             <Row k="Service charge" v={inr(app.service_charge)} />
             <Row k="Other charges" v={inr(app.other_charges)} />
             <div className="flex justify-between py-1 text-sm font-bold"><span>Total</span><span>{inr(app.total)}</span></div>

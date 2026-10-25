@@ -1,3 +1,4 @@
+import { govFeeCollected } from "@/lib/labels";
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CheckCircle2, Circle, AlertCircle, FileText, Receipt as ReceiptIcon } from "lucide-react";
@@ -80,8 +81,8 @@ export default function ApplicationDetail() {
       current: awaitingPayment,
     },
     { status: "Under Review", date: inReview ? fmtDate(app.updated_date) : "Pending", by: "DocuFast India", done: inReview, current: app.status === "Under Review" },
-    { status: "Approved", date: approved ? fmtDate(app.updated_date) : "Pending", by: "Government Authority", done: approved },
-    { status: "Completed", date: app.status === "Completed" ? fmtDate(app.updated_date) : "Pending", by: "Government Authority", done: app.status === "Completed" },
+    { status: "Approved", date: approved ? fmtDate(app.updated_date) : "Pending", by: "Updated by DocuFast", done: approved },
+    { status: "Completed", date: app.status === "Completed" ? fmtDate(app.updated_date) : "Pending", by: "Updated by DocuFast", done: app.status === "Completed" },
   ];
 
   const docs = Array.isArray(app.documents) ? app.documents : [];
@@ -189,12 +190,15 @@ export default function ApplicationDetail() {
         <h2 className="mt-6 px-1 font-heading text-base font-bold text-foreground">Payment Information</h2>
         <div className="mt-3 rounded-2xl border border-border bg-white p-5 shadow-card">
           <div className="space-y-1.5 text-sm">
-            <Row label="Government Fee" value={`₹${app.government_fee || 0}`} />
+            {govFeeCollected(app) && <Row label="Government Fee (collected earlier)" value={`₹${app.government_fee || 0}`} />}
             <Row label="DocuFast Service Charge" value={`₹${app.service_charge || 0}`} />
             <Row label="Other Charges" value={`₹${app.other_charges || 0}`} />
             <div className="flex justify-between border-t border-border pt-1.5 font-semibold">
               <span>{isPaid ? "Total Paid" : "Total"}</span><span className="text-gold">₹{app.total || 0}</span>
             </div>
+            {Number(app.government_fee) > 0 && !govFeeCollected(app) && (
+              <p className="pt-1 text-[11px] text-amber-800">Official fee ₹{app.government_fee} is set by the department and is paid by you directly to it. It is not part of this payment.</p>
+            )}
           </div>
           {payment && (
             <div className={`mt-3 flex items-center gap-2 rounded-lg px-3 py-2 ${isPaid ? "bg-emerald-50" : "bg-amber-50"}`}>

@@ -26,7 +26,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
             <p className="mt-5 text-center text-sm text-muted-foreground">{footer}</p>
           )}
           <p className="mt-6 text-center text-[11px] leading-relaxed text-muted-foreground/80">
-            DocuFast India is an independent facilitation platform and is not a government department.
+            DocuFast is an independent private service and is not a government department.
           </p>
         </div>
       </div>

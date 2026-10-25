@@ -29,7 +29,7 @@ Your app is a website, so it goes to Play as a **Trusted Web Activity (TWA)**: a
 
 | Play policy | Risk for this app | What to do |
 |---|---|---|
-| **Impersonation / misrepresentation** | Apps about government services get extra scrutiny; reviewers reject anything that looks official | App name has no "Govt/Official"; every page says private service provider; first line of store description says the same. Keep it. |
+| **Impersonation / misrepresentation** | Apps about government services get extra scrutiny; reviewers reject anything that looks official | App name is "DocuFast" (no Govt/Official/India). Every service page links to the official source and says we are a private service. We collect only our own service charge; the official fee is paid by the customer to the department. Keep it this way. |
 | **User data / privacy policy** | Policy URL required, must match what the app does | `https://YOUR-SITE/privacy` (updated) |
 | **Account deletion** | Needs in-app path **and** a web URL | In-app: Profile → Request Account Deletion. Web: `https://YOUR-SITE/delete-account` |
 | **Permissions** | Location is requested only when the customer taps "Use my location" | Declare in Data safety (below). A TWA uses the browser's permission prompt. |
@@ -39,30 +39,31 @@ Your app is a website, so it goes to Play as a **Trusted Web Activity (TWA)**: a
 
 ## 4. Store listing text (copy / paste)
 
-**App name (max 30):** `DocuFast India`
+Google rejected the first app (Misleading Claims: government information without official source links, and fees around government services). This version is a **new app** with a **new package name** (`in.docufast.help`) and a new name, and the content was changed first. Create it as a **new app** in Play Console; do not reuse the old one.
+
+**App name (max 30):** `DocuFast`
 
 **Short description (max 80):**
-`Get expert help with document applications. Private service, not government.`
+`Document checking, form help and appointments. Private service, not government.`
 
 **Full description (max 4000):**
 ```
-DocuFast India is a private assistance service that helps you prepare and submit applications for government and document services.
+DocuFast is a private document-help service in Mahabubnagar, Telangana, run by DocuFast India.
 
-IMPORTANT: DocuFast India is an independent private company. We are NOT a government department, we do not represent any government body, and our app is not an official government app. We charge a transparent service fee for our assistance. Government fees, where they apply, are shown separately.
+IMPORTANT: DocuFast is NOT a government app and is not connected with any government body. We do not issue any official documents and we cannot approve applications. The department decides every application. Every service page in the app links to the official government website, and you can always apply there yourself.
 
-WHAT YOU CAN DO
-• Browse services and see clear pricing (government fee + our service fee)
-• Apply in three simple steps: details, documents, review and pay
-• Save multiple addresses and fill them in one tap
-• Pay securely online (UPI, cards, net banking)
-• Track your application with a live timeline
-• Get updates and reference numbers from our team, right in the app
-• Book an appointment: visit our office or get a phone call, at a time that suits you
-• Download your payment receipt
-• Carry your DocuFast membership card
+WHAT WE DO FOR YOU
+• Check that your documents are complete and correct
+• Help you fill in the application and choose the right options
+• Guide you through submitting it on the official website or at the office
+• Book an appointment: visit our office or get a phone call
+• Show your progress and any reference numbers we share with you, inside the app
+
+WHAT YOU PAY
+You pay DocuFast only our own service charge, shown before you pay. Any official fee is set by the department and you pay it directly to the department; we do not collect it.
 
 YOUR DATA
-Your documents are stored securely and used only for your application. You can request deletion of your account at any time from Profile.
+Your documents are stored securely and used only for your request. You can request deletion of your account at any time from Profile.
 
 CONTACT
 Support: Mon–Sat, 10:00 AM – 9:00 PM IST. Phone / WhatsApp: 8374968022. Email: docufast.india@gmail.com
@@ -70,8 +71,14 @@ Privacy policy and terms are available inside the app.
 ```
 
 **Category:** Business (alternative: Productivity)
-**Tags:** documents, services, applications
-**Contact email:** your support email · **Phone:** 8374968022 · **Website:** your Vercel/own domain
+**Tags:** documents, appointments, applications
+**Contact email:** your support email · **Phone:** 8374968022 · **Website:** `https://docufast-app.vercel.app`
+
+**Before you submit**
+1. Run `supabase/migration_010_official_links.sql` once in the Supabase SQL Editor.
+2. In Admin → Services, open **every** service and fill in **Official source link** (the real government page for that service, `https://…gov.in`). Set **Official fee (info only)** to the real official fee, if any. Check the Service Charge covers only your own work.
+3. Open the website as a customer and check each service page shows the official-source box.
+4. **Government apps declaration:** answer that the app is NOT developed by or for a government. In the description of what you do, say: "Private document-help service. Not affiliated with any government."
 
 ## 5. Build the Android app (no third-party site)
 

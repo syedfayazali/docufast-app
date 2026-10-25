@@ -1,3 +1,4 @@
+import { catLabel } from "@/lib/labels";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, ShieldCheck, Activity, Headphones, ChevronRight, FileText, Plane, ScrollText, Award, Users, Calendar } from "lucide-react";
@@ -76,10 +77,10 @@ export default function Home() {
             <span className="text-sm font-semibold">No Hidden Charges</span>
           </div>
           <p className="mt-1.5 text-sm text-white/75">
-            Government fees and DocuFast India service charges are clearly shown.
+            You pay only our service charge. Any official fee is shown separately and paid by you directly to the department.
           </p>
           <p className="mt-2 text-[11px] text-white/60">
-            Independent private assistance service. Not a government website.
+            Independent private document-help service. Not a government website and not connected with any government body.
           </p>
         </div>
 
@@ -95,7 +96,7 @@ export default function Home() {
               <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${color}`}>
                 <Icon className="h-5 w-5" />
               </div>
-              <span className="text-xs font-semibold text-foreground">{name}</span>
+              <span className="text-xs font-semibold text-foreground">{catLabel(name)}</span>
             </button>
           ))}
         </div>

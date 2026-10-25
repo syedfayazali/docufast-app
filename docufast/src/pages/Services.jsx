@@ -1,3 +1,4 @@
+import { catLabel } from "@/lib/labels";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Search, LayoutGrid } from "lucide-react";
@@ -59,7 +60,7 @@ export default function Services() {
                 active === f ? "bg-navy text-white" : "border border-border bg-white text-muted-foreground"
               }`}
             >
-              {f}
+              {catLabel(f)}
             </button>
           ))}
         </div>
@@ -79,7 +80,7 @@ export default function Services() {
         </div>
 
         <p className="mt-5 text-center text-[11px] text-muted-foreground">
-          * Government fees are as prescribed by the concerned authority and may change. Our service charge is shown separately.
+          * Prices shown are our service charge only. Any official fee is set by the department, is paid by you directly to it, and may change. Each service page links to the official website.
         </p>
       </main>
       <Footer />

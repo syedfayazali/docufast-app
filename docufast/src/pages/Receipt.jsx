@@ -1,3 +1,4 @@
+import { govFeeCollected } from "@/lib/labels";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Printer } from "lucide-react";
@@ -44,8 +45,8 @@ export default function Receipt() {
 
   const show = (v) => (v && !isPlaceholder(v) ? v : null);
   const rows = [
-    ["Government Fee", app.government_fee],
-    ["DocuFast India Service Charge", app.service_charge],
+    ...(govFeeCollected(app) ? [["Government Fee (collected earlier)", app.government_fee]] : []),
+    ["DocuFast Service Charge", app.service_charge],
     ["Other Charges", app.other_charges],
   ].filter(([, v]) => Number(v) > 0);
 
@@ -100,8 +101,8 @@ export default function Receipt() {
         </div>
 
         <p className="mt-5 text-[11px] leading-relaxed text-muted-foreground">
-          This is a payment receipt for the application above. The government fee is passed on to the relevant
-          authority; {businessInfo.brandName} is an independent private service and not a government office. Refunds
+          This is a payment receipt for the application above. This receipt covers our service charge only. Any official fee is paid by the customer directly to the department.
+          {businessInfo.brandName} is an independent private service and not a government office. Refunds
           follow our Refund Policy. This receipt is computer generated and needs no signature.
         </p>
       </main>

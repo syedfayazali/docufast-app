@@ -6,8 +6,8 @@ import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
 
 const faqs = [
-  { q: "Is DocuFast India a government department?", a: "No. DocuFast India is an independent facilitation platform. We help you prepare and track applications, but we are not a government body." },
-  { q: "Are government fees and service charges separate?", a: "Yes. We always show the government fee and the DocuFast India service charge separately, with no hidden charges." },
+  { q: "Is DocuFast a government department?", a: "No. DocuFast is an independent private document-help service. We are not a government body and are not connected with one." },
+  { q: "Do I pay the official fee to DocuFast?", a: "No. Any official fee is set by the department and paid by you directly to it. You pay DocuFast only our service charge, shown before you pay. Each service page links to the official website, and you can always apply there yourself." },
   { q: "Does DocuFast India guarantee approval?", a: "No. Approval depends on the concerned government authority. We do not guarantee approval or specific processing times." },
   { q: "Can I get a refund or cancel my application?", a: "Yes, in the cases described in our Refund & Cancellation Policy (link in the footer). Contact us with your application number and we will guide you." },
   { q: "How do I track my application?", a: "Go to My Applications or use the Track Your Application section on the home page with your reference number." },

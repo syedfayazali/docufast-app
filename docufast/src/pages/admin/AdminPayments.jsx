@@ -86,7 +86,7 @@ export default function AdminPayments() {
   return (
     <AdminLayout title="Payment Records">
       <div className="grid grid-cols-3 gap-3">
-        <Summary label="Government Fees" value={totalGovt} tone="text-blue-700 bg-blue-50" />
+        <Summary label="Official fees (info)" value={totalGovt} tone="text-blue-700 bg-blue-50" />
         <Summary label="Service Charges" value={totalCharge} tone="text-gold bg-amber-50" />
         <Summary label="Total Collected" value={totalAll} tone="text-emerald-700 bg-emerald-50" />
       </div>
@@ -147,7 +147,7 @@ export default function AdminPayments() {
               </p>
 
               <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                <Breakdown label="Govt Fee" value={p.government_fee || 0} tone="text-blue-700" />
+                <Breakdown label="Official fee" value={p.government_fee || 0} tone="text-blue-700" />
                 <Breakdown label="Service Charge" value={p.service_charge || 0} tone="text-gold" />
                 <Breakdown label="Total" value={p.total || 0} tone="text-emerald-700" bold />
               </div>
