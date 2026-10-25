@@ -81,7 +81,7 @@ export default function ServiceEditor() {
     setSaving(true); setMsg("");
     try {
       const url = String(form.official_url || "").trim();
-      if (!/^https:\/\/[^\s/]+\.[^\s/]+/i.test(url)) throw new Error("Official source link must be a full website address starting with https://");
+      if (url && !/^https:\/\/[^\s/]+\.[^\s/]+/i.test(url)) throw new Error("Official source link must be a full website address starting with https://");
       const payload = {
         ...form,
         category: form.category || categoryOptions[0],
@@ -144,7 +144,7 @@ export default function ServiceEditor() {
             </div>
 
             <p className="-mt-1 text-[11px] text-muted-foreground">Official fee is only shown to the customer. They pay it directly to the department. Customers pay you only the Service Charge + Other.</p>
-            <Field label="Official source link (required, e.g. https://www.passportindia.gov.in)" value={form.official_url} onChange={(v) => set("official_url", v)} required />
+            <Field label="Official source link (required for every government-related service, e.g. https://www.passportindia.gov.in). Leave empty only for non-government items like photocopy." value={form.official_url} onChange={(v) => set("official_url", v)} />
             <Area label="Document Requirements (one per line)" value={form.requirements} onChange={(v) => set("requirements", v)} rows={4} />
             <Field label="Eligibility / Who can apply" value={form.eligibility} onChange={(v) => set("eligibility", v)} />
             <Field label="Processing Info" value={form.processing_info} onChange={(v) => set("processing_info", v)} />
