@@ -26,7 +26,7 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
   React.useEffect(() => {
     backend.entities.Service.list("display_order", 50)
-      .then(setServices)
+      .then((rows) => setServices(rows.filter((s) => s.active !== false)))
       .catch(() => setServices([]));
     backend.entities.Banner.filter({ active: true }, "-display_order", 1)
       .then((rows) => setBanner(rows[0] || null))

@@ -20,7 +20,7 @@ export default function Services() {
 
   React.useEffect(() => {
     backend.entities.Service.list("display_order", 100)
-      .then(setServices)
+      .then((rows) => setServices(rows.filter((s) => s.active !== false)))
       .catch(() => setServices([]));
     backend.entities.Category.list("display_order", 100)
       .then((rows) => {

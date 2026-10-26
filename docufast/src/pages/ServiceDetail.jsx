@@ -24,7 +24,7 @@ export default function ServiceDetail() {
 
   React.useEffect(() => {
     backend.entities.Service.get(id)
-      .then((s) => setService(s))
+      .then((s) => setService(s && s.active === false ? null : s))
       .catch(() => setService(null))
       .finally(() => setLoading(false));
   }, [id]);
