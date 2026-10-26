@@ -15,7 +15,7 @@ android {
         applicationId 'in.docufast.help'   // can never change after publishing
         minSdk 24
         targetSdk 36
-        versionCode 1                          // +1 for every new upload to Play
+        versionCode 2                          // +1 for every new upload to Play
         versionName '1.0'
 
         manifestPlaceholders = [
