@@ -46,27 +46,37 @@ Google rejected the first app (Misleading Claims: government information without
 **Short description (max 80):**
 `Document checking, form help and appointments. Private service, not government.`
 
-**Full description (max 4000):**
+**Full description (max 4000):** (Google requires the official source links and a clear disclaimer in the description itself)
 ```
+DISCLAIMER: DocuFast is a private company. It is NOT a government app, does not represent any government entity, and is not affiliated with, endorsed by or authorised by any government body. We do not issue official documents and we cannot approve applications. Every decision is made by the government department.
+
+OFFICIAL GOVERNMENT SOURCES
+All government information and services mentioned in this app come from these official websites. You can use them directly, without DocuFast, at any time:
+• Passport services: https://www.passportindia.gov.in
+• Property registration and deeds (Telangana): https://registration.telangana.gov.in
+• Birth, income, residence and family certificates (Telangana Mee Seva): https://ts.meeseva.telangana.gov.in
+• PAN card: https://incometaxindia.gov.in/tax-services/apply-for-pan
+• Aadhaar PVC card: https://myaadhaar.uidai.gov.in/genricPVC
+• Voter ID: https://voters.eci.gov.in
+• Driving licence: https://parivahan.gov.in
+• Ration card (Telangana): https://epds.telangana.gov.in
+
+WHAT DOCUFAST DOES
 DocuFast is a private document-help service in Mahabubnagar, Telangana, run by DocuFast India.
-
-IMPORTANT: DocuFast is NOT a government app and is not connected with any government body. We do not issue any official documents and we cannot approve applications. The department decides every application. Every service page in the app links to the official government website, and you can always apply there yourself.
-
-WHAT WE DO FOR YOU
-• Check that your documents are complete and correct
-• Help you fill in the application and choose the right options
-• Guide you through submitting it on the official website or at the office
-• Book an appointment: visit our office or get a phone call
-• Show your progress and any reference numbers we share with you, inside the app
+• Checks that your documents are complete and correct
+• Helps you fill in the application and choose the right options
+• Guides you through submitting it on the official website or at the office
+• Books an appointment: visit our office or get a phone call
+• Shows your progress and any reference numbers we share with you
 
 WHAT YOU PAY
-You pay DocuFast only our own service charge, shown before you pay. Any official fee is set by the department and you pay it directly to the department; we do not collect it.
+You pay DocuFast only our own service charge, shown before you pay. Any official fee is set by the department and you pay it directly to the department. We do not collect it.
 
 YOUR DATA
 Your documents are stored securely and used only for your request. You can request deletion of your account at any time from Profile.
 
 CONTACT
-Support: Mon–Sat, 10:00 AM – 9:00 PM IST. Phone / WhatsApp: 8374968022. Email: docufast.india@gmail.com
+Support: Mon-Sat, 10:00 AM - 9:00 PM IST. Phone / WhatsApp: 8374968022. Email: docufast.india@gmail.com
 Privacy policy and terms are available inside the app.
 ```
 
