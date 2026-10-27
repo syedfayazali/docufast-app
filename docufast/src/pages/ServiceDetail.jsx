@@ -168,10 +168,10 @@ export default function ServiceDetail() {
         <section className="mt-4 rounded-2xl border border-border bg-white p-5 shadow-card">
           <div className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-navy" />
-            <h2 className="font-heading text-base font-bold text-navy">Estimated Processing</h2>
+            <h2 className="font-heading text-base font-bold text-navy">Our estimate of the time (not official)</h2>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            {service.processing_info || "Timing depends on the department. We cannot promise a date."}
+            {(service.processing_info ? service.processing_info + " " : "") + "This is only our estimate. The department decides the real time and we cannot promise a date."}
           </p>
         </section>
 

@@ -54,12 +54,12 @@ OFFICIAL GOVERNMENT SOURCES
 All government information and services mentioned in this app come from these official websites. You can use them directly, without DocuFast, at any time:
 • Passport services: https://www.passportindia.gov.in
 • Property registration and deeds (Telangana): https://registration.telangana.gov.in
-• Birth, income, residence and family certificates (Telangana Mee Seva): https://ts.meeseva.telangana.gov.in
+• Birth, income, residence and family certificates (Telangana Mee Seva): https://ts.meeseva.telangana.gov.in/meeseva/home.htm
 • PAN card: https://incometaxindia.gov.in/tax-services/apply-for-pan
-• Aadhaar PVC card: https://myaadhaar.uidai.gov.in/genricPVC
+• Aadhaar: https://uidai.gov.in
 • Voter ID: https://voters.eci.gov.in
 • Driving licence: https://parivahan.gov.in
-• Ration card (Telangana): https://epds.telangana.gov.in
+• Ration card (Telangana Civil Supplies Department): https://civilsupplies.telangana.gov.in
 
 WHAT DOCUFAST DOES
 DocuFast is a private document-help service in Mahabubnagar, Telangana, run by DocuFast India.
