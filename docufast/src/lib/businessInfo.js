@@ -16,7 +16,7 @@ export const businessInfo = {
 
   phone: "8374968022",
   whatsapp: "8374968022",
-  email: "DOCUFAST.INDIA@GMAIL.COM",
+  email: "help@docufastindia.com",
 
   // Optional: leave as "" if you don't have one yet (the line is hidden when empty)
   gstin: "",

@@ -9,7 +9,7 @@ export function pushReady() {
   const priv = process.env.VAPID_PRIVATE_KEY;
   if (!pub || !priv) return (ready = false);
   try {
-    webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:docufast.india@gmail.com', pub, priv);
+    webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:help@docufastindia.com', pub, priv);
     ready = true;
   } catch (e) {
     console.error('[push] bad VAPID settings', e?.message);
