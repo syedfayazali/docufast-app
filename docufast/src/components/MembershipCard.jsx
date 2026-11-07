@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Download, Check, Phone, MessageCircle, Globe, MapPin, Facebook, Instagram, Linkedin, Twitter, Youtube, RotateCw } from "lucide-react";
+import { Download, Pencil, Check, Phone, MessageCircle, Globe, MapPin, Facebook, Instagram, Linkedin, Twitter, Youtube, RotateCw } from "lucide-react";
 import Logo from "@/components/Logo";
 
 /*
@@ -151,7 +151,7 @@ function BackFace() {
   );
 }
 
-export default function MembershipCard({ user }) {
+export default function MembershipCard({ user, onEditName }) {
   const boxRef = useRef(null);
   const frontCap = useRef(null);
   const backCap = useRef(null);
@@ -225,9 +225,16 @@ export default function MembershipCard({ user }) {
     <div className="mt-4">
       <div className="mb-2 flex items-center justify-between px-1">
         <h2 className="font-heading text-sm font-bold text-navy">Membership Card</h2>
+        <div className="flex items-center gap-2">
+        {onEditName && (
+          <button onClick={onEditName} className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold text-navy">
+            <Pencil className="h-3.5 w-3.5" /> {user?.full_name ? "Edit name" : "Add name"}
+          </button>
+        )}
         <button onClick={handleDownload} disabled={capturing} className="flex items-center gap-1.5 rounded-lg bg-gold/15 px-2.5 py-1.5 text-xs font-semibold text-gold disabled:opacity-60">
           <Download className="h-3.5 w-3.5" /> {capturing ? "Preparing…" : "Download"}
         </button>
+        </div>
       </div>
 
       <div ref={boxRef} className="mx-auto w-full" style={{ maxWidth: MAX_WIDTH }}>

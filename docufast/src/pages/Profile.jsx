@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, FileText, CreditCard, Bell, Headphones, LogOut, ChevronRight, Shield, Trash2, Camera, Loader2, Calendar } from "lucide-react";
+import { User, Pencil, FileText, CreditCard, Bell, Headphones, LogOut, ChevronRight, Shield, Trash2, Camera, Loader2, Calendar } from "lucide-react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import MembershipCard from "@/components/MembershipCard";
 import AddressPicker from "@/components/AddressPicker";
 import PushToggle from "@/components/PushToggle";
+import AvatarCropper from "@/components/AvatarCropper";
+import NameDialog from "@/components/NameDialog";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -46,21 +48,39 @@ export default function Profile() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoError, setPhotoError] = useState("");
   const [photoFailed, setPhotoFailed] = useState(false);
-  const onPickPhoto = async (e) => {
+  const [cropFile, setCropFile] = useState(null);
+  const onPickPhoto = (e) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file || !user) return;
     setPhotoError("");
+    if (!file.type.startsWith("image/")) { setPhotoError("Please choose an image (JPG or PNG)."); return; }
+    if (file.size > 15 * 1024 * 1024) { setPhotoError("That image is too large. Please choose one under 15 MB."); return; }
+    setCropFile(file); // opens the move-and-zoom window
+  };
+  const saveCropped = async (blob) => {
     setUploadingPhoto(true);
     try {
-      const url = await uploadAvatar(file, user.id);
+      const url = await uploadAvatar(blob, user.id, { cropped: true });
       setPhotoFailed(false);
       updateUser({ avatar_url: url }); // show it immediately everywhere
       checkUserAuth(); // then re-sync with the database
+      setCropFile(null);
     } catch (err) {
       setPhotoError(err.message || "Could not upload the photo.");
+      setCropFile(null);
+    } finally {
+      setUploadingPhoto(false);
     }
-    setUploadingPhoto(false);
+  };
+
+  const [nameOpen, setNameOpen] = useState(false);
+  const saveName = async (name) => {
+    const { data, error } = await supabase.from("profiles").update({ full_name: name }).eq("id", user.id).select("full_name").maybeSingle();
+    if (error || !data) throw new Error("Could not save your name. Please try again.");
+    updateUser({ full_name: name });
+    checkUserAuth();
+    setNameOpen(false);
   };
 
   const [deleting, setDeleting] = useState(false);
@@ -130,7 +150,15 @@ export default function Profile() {
         <div className="mt-4 rounded-2xl border border-border bg-white p-4 shadow-card">
           <h2 className="px-1 font-heading text-sm font-bold text-navy">Account Information</h2>
           <dl className="mt-3 divide-y divide-border text-sm">
-            <InfoRow label="Name" value={displayName} />
+            <div className="flex items-center justify-between py-2.5">
+              <dt className="text-muted-foreground">Name</dt>
+              <dd className="flex items-center gap-2 font-medium text-foreground">
+                {displayName}
+                <button onClick={() => setNameOpen(true)} className="flex items-center gap-1 rounded-lg bg-gold/15 px-2 py-1 text-[11px] font-semibold text-gold">
+                  <Pencil className="h-3 w-3" /> {user?.full_name ? "Edit" : "Add"}
+                </button>
+              </dd>
+            </div>
             <InfoRow label="Email" value={user?.email || "—"} />
             <InfoRow label="Account Type" value={user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "Customer"} />
             <InfoRow label="Member Since" value={memberSince} />
@@ -170,7 +198,10 @@ export default function Profile() {
           <AddressPicker selectable={false} />
         </div>
 
-        <MembershipCard user={user} />
+        <MembershipCard user={user} onEditName={() => setNameOpen(true)} />
+
+        <AvatarCropper file={cropFile} onCancel={() => setCropFile(null)} onDone={saveCropped} />
+        <NameDialog open={nameOpen} initial={user?.full_name} onCancel={() => setNameOpen(false)} onSave={saveName} />
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-white shadow-card">
           {items.map(({ label, icon: Icon, to }, i) => (

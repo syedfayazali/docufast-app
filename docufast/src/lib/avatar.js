@@ -29,10 +29,11 @@ async function toSquareJpeg(file, size = 480) {
 }
 
 /** Uploads the customer's photo to the public "avatars" bucket and saves its URL on their profile. */
-export async function uploadAvatar(file, userId) {
+export async function uploadAvatar(file, userId, { cropped = false } = {}) {
   if (!file || !file.type.startsWith("image/")) throw new Error("Please choose an image (JPG or PNG).");
   if (file.size > 15 * 1024 * 1024) throw new Error("That image is too large. Please choose one under 15 MB.");
-  const blob = await toSquareJpeg(file);
+  // A picture the customer already framed in the cropper is saved as it is; anything else is centre-cropped.
+  const blob = cropped ? file : await toSquareJpeg(file);
   const path = `${userId}/avatar.jpg`;
   const { error } = await supabase.storage.from("avatars").upload(path, blob, {
     upsert: true,
